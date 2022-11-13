@@ -9,6 +9,7 @@ import {
   NameInput,
   BirthdayInput,
   LocationInput,
+  UserDashBoard,
 } from '../screens';
 // import Login from '../screens/auth/Login';
 // import FirstScreen from '../screens/First';
@@ -29,7 +30,8 @@ const AppNavigator = () => {
         {/* <Stack.Screen name="ConfirmCode" component={ConfirmCode} /> */}
         {/* <Stack.Screen name="NameInput" component={NameInput} /> */}
         {/* <Stack.Screen name="BirthdayInput" component={BirthdayInput} /> */}
-        <Stack.Screen name="LocationInput" component={LocationInput} />
+        {/* <Stack.Screen name="LocationInput" component={LocationInput} /> */}
+        <Stack.Screen name="UserDashBoard" component={UserDashBoard} />
       </Stack.Navigator>
     </NavigationContainer>
   );
