@@ -1,8 +1,9 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import FirstScreen from '../screens/First';
-
+import {FirstScreen, Login} from '../screens';
+// import Login from '../screens/auth/Login';
+// import FirstScreen from '../screens/First';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -14,7 +15,8 @@ const AppNavigator = () => {
           presentation: 'card',
         }}
       >
-        <Stack.Screen name="Home" component={FirstScreen} />
+        {/* <Stack.Screen name="Home" component={FirstScreen} /> */}
+        <Stack.Screen name="Login" component={Login} />
       </Stack.Navigator>
     </NavigationContainer>
   );
