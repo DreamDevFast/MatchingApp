@@ -1,25 +1,19 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
-import {View, Text} from 'react-native-ui-lib';
-import {Colors} from '../styles';
 
-import CustomButton from '../components/CustomButton';
+import {CustomButton, Container, CustomText} from '../components';
 
 const FirstScreen = () => {
   return (
-    <View style={styles.container}>
-      <Text>This is first screen</Text>
+    <Container flex bottom centerH>
+      <CustomText marginB-100>
+        ログインをタップすると、利用規約およびプライバシーポリシーに同意したものとみなされます。
+      </CustomText>
       <CustomButton label="ログイン" />
-    </View>
+      <CustomText marginB-40 marginT-10>
+        ログインに問題がありますか？
+      </CustomText>
+    </Container>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    height: '100%',
-    resizeMode: 'contain',
-    backgroundColor: Colors.back,
-  },
-});
 
 export default FirstScreen;

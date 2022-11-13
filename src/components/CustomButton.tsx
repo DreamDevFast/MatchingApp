@@ -28,6 +28,7 @@ const CustomButton = ({label, color, mode, props}: Props) => {
 const styles = StyleSheet.create({
   customBtn: {
     borderRadius: 50,
+    width: '80%',
   },
 });
 
