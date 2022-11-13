@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {FirstScreen, Login} from '../screens';
+import {ConfirmCode, FirstScreen, Login, Register} from '../screens';
 // import Login from '../screens/auth/Login';
 // import FirstScreen from '../screens/First';
 const Stack = createStackNavigator();
@@ -16,7 +16,9 @@ const AppNavigator = () => {
         }}
       >
         {/* <Stack.Screen name="Home" component={FirstScreen} /> */}
-        <Stack.Screen name="Login" component={Login} />
+        {/* <Stack.Screen name="Login" component={Login} /> */}
+        {/* <Stack.Screen name="Register" component={Register} /> */}
+        <Stack.Screen name="ConfirmCode" component={ConfirmCode} />
       </Stack.Navigator>
     </NavigationContainer>
   );
