@@ -8,6 +8,7 @@ import {
   Register,
   NameInput,
   BirthdayInput,
+  LocationInput,
 } from '../screens';
 // import Login from '../screens/auth/Login';
 // import FirstScreen from '../screens/First';
@@ -27,7 +28,8 @@ const AppNavigator = () => {
         {/* <Stack.Screen name="Register" component={Register} /> */}
         {/* <Stack.Screen name="ConfirmCode" component={ConfirmCode} /> */}
         {/* <Stack.Screen name="NameInput" component={NameInput} /> */}
-        <Stack.Screen name="BirthdayInput" component={BirthdayInput} />
+        {/* <Stack.Screen name="BirthdayInput" component={BirthdayInput} /> */}
+        <Stack.Screen name="LocationInput" component={LocationInput} />
       </Stack.Navigator>
     </NavigationContainer>
   );
