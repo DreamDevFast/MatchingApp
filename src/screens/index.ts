@@ -6,3 +6,4 @@ export {default as NameInput} from './auth/NameInput';
 export {default as BirthdayInput} from './auth/BirthdayInput';
 export {default as LocationInput} from './auth/LocationInput';
 export {default as UserDashBoard} from './user/DashBoard.user';
+export {default as UserSetting} from './user/Setting.user';
