@@ -12,6 +12,7 @@ import {
   UserDashBoard,
   UserSetting,
 } from '../screens';
+import UserProfile from '../screens/user/Profile.user';
 // import Login from '../screens/auth/Login';
 // import FirstScreen from '../screens/First';
 const Stack = createStackNavigator();
@@ -33,7 +34,8 @@ const AppNavigator = () => {
         {/* <Stack.Screen name="BirthdayInput" component={BirthdayInput} /> */}
         {/* <Stack.Screen name="LocationInput" component={LocationInput} /> */}
         {/* <Stack.Screen name="UserDashBoard" component={UserDashBoard} /> */}
-        <Stack.Screen name="UserSetting" component={UserSetting} />
+        {/* <Stack.Screen name="UserSetting" component={UserSetting} /> */}
+        <Stack.Screen name="UserProfile" component={UserProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   );
