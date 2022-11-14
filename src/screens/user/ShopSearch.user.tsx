@@ -47,7 +47,13 @@ const UserShopSearch = ({navigation, route}: any) => {
             }}
             style={styles.image}
           >
-            <View style={{...styles.container, ...getBackgroundColor()}}>
+            <View
+              style={{...styles.container, ...getBackgroundColor()}}
+              onStartShouldSetResponder={() => {
+                console.log('pressed');
+                return true;
+              }}
+            >
               {state === 'like' ? (
                 <Entypo
                   name="heart"

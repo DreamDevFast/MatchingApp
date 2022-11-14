@@ -14,6 +14,8 @@ import {
   UserShopSearch,
 } from '../screens';
 import UserProfile from '../screens/user/Profile.user';
+import UserShopDetail from '../screens/user/ShopDetail.user';
+import UserChat from '../screens/user/Chat.user';
 // import Login from '../screens/auth/Login';
 // import FirstScreen from '../screens/First';
 const Stack = createStackNavigator();
@@ -38,6 +40,8 @@ const AppNavigator = () => {
         {/* <Stack.Screen name="UserSetting" component={UserSetting} /> */}
         {/* <Stack.Screen name="UserProfile" component={UserProfile} /> */}
         <Stack.Screen name="UserShopSearch" component={UserShopSearch} />
+        {/* <Stack.Screen name="UserShopDetail" component={UserShopDetail} /> */}
+        <Stack.Screen name="UserChat" component={UserChat} />
       </Stack.Navigator>
     </NavigationContainer>
   );
