@@ -13,7 +13,6 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
         <IconButton
           icon="user-alt"
           color={Colors.white}
-          rippleColor={Colors.redBtn}
           size={25}
           style={
             route.name == 'UserDashBoard'
@@ -25,7 +24,6 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
         <IconButton
           icon="fire"
           color={Colors.white}
-          rippleColor={Colors.redBtn}
           size={25}
           style={
             route.name == 'UserShopSearch'
@@ -37,7 +35,6 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
         <IconButton
           icon="comment"
           color={Colors.white}
-          rippleColor={Colors.redBtn}
           size={25}
           style={
             route.name == 'UserChat'
