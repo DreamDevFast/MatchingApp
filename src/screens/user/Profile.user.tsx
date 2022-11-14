@@ -4,9 +4,10 @@ import {
   ImageBackground,
   Dimensions,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import {Appbar, Divider} from 'react-native-paper';
-import {Text, View} from 'react-native-ui-lib';
+import {Image, Text, View} from 'react-native-ui-lib';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -51,12 +52,80 @@ const UserProfile = () => {
             可愛い衣装を着たい！時給がいいところで働きたいです！ビジュアルに自信があります！
           </Text>
           <Divider style={styles.divider} />
-          <View>
-            <Text color={Colors.white}>
-              可愛い衣装を着たい！時給がいいところで働きたいです！ビジュアルに自信があります！
-            </Text>
-          </View>
-          <View centerH>
+          <ScrollView horizontal={true}>
+            <View row>
+              <View paddingH-5 style={styles.thumb}>
+                <Image
+                  source={{
+                    uri:
+                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+                  }}
+                  style={styles.thumb_image}
+                />
+                <View marginB-10></View>
+                <Image
+                  source={{
+                    uri:
+                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+                  }}
+                  style={styles.thumb_image}
+                />
+              </View>
+              <View paddingH-5 style={styles.thumb}>
+                <Image
+                  source={{
+                    uri:
+                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+                  }}
+                  style={styles.thumb_image}
+                />
+                <View marginB-10></View>
+                <Image
+                  source={{
+                    uri:
+                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+                  }}
+                  style={styles.thumb_image}
+                />
+              </View>
+              <View paddingH-5 style={styles.thumb}>
+                <Image
+                  source={{
+                    uri:
+                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+                  }}
+                  style={styles.thumb_image}
+                />
+                <View marginB-10></View>
+                <Image
+                  source={{
+                    uri:
+                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+                  }}
+                  style={styles.thumb_image}
+                />
+              </View>
+              <View paddingH-5 style={styles.thumb}>
+                <Image
+                  source={{
+                    uri:
+                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+                  }}
+                  style={styles.thumb_image}
+                />
+                <View marginB-10></View>
+                <Image
+                  source={{
+                    uri:
+                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+                  }}
+                  style={styles.thumb_image}
+                />
+              </View>
+            </View>
+          </ScrollView>
+          <Divider style={styles.divider} />
+          <View centerH paddingV-50>
             <CustomButton label="戻る" />
           </View>
         </View>
@@ -86,7 +155,15 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   divider: {
-    backgroundColor: Colors.white,
+    height: 1,
+    backgroundColor: Colors.iconLabel,
+    marginVertical: 10,
+  },
+  thumb: {
+    width: width * 0.3,
+  },
+  thumb_image: {
+    height: width * 0.3,
   },
 });
 export default UserProfile;
