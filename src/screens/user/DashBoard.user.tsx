@@ -6,34 +6,13 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {CustomButton, Container, CustomText} from '../../components';
 import {Colors} from '../../styles';
 import {Text, View} from 'react-native-ui-lib';
+import UserShopSearch from './ShopSearch.user';
+import CustomTabnav from '../../components/CustomTabnav';
 
-const UserDashBoard = () => {
+const DefaultTab = () => {
   const [profile, setProfile] = useState({avatar: 'default.png'});
   return (
-    <Container flex centerH>
-      <Container row spread style={styles.toolBar}>
-        <IconButton
-          icon="user-alt"
-          color={Colors.white}
-          rippleColor={Colors.redBtn}
-          size={25}
-          onPress={() => console.log('Pressed')}
-        />
-        <IconButton
-          icon="fire"
-          color={Colors.white}
-          rippleColor={Colors.redBtn}
-          size={25}
-          onPress={() => console.log('Pressed')}
-        />
-        <IconButton
-          icon="comment"
-          color={Colors.white}
-          rippleColor={Colors.redBtn}
-          size={25}
-          onPress={() => console.log('Pressed')}
-        />
-      </Container>
+    <>
       <View marginT-30>
         {profile.avatar === 'default.png' ? (
           <Avatar.Icon size={250} icon="user" />
@@ -76,7 +55,14 @@ const UserDashBoard = () => {
         />
         <Text style={styles.iconLabel}>画像を追加</Text>
       </View>
-    </Container>
+    </>
+  );
+};
+const UserDashBoard = ({navigation, route}: any) => {
+  return (
+    <CustomTabnav navigation={navigation} route={route}>
+      <DefaultTab />
+    </CustomTabnav>
   );
 };
 

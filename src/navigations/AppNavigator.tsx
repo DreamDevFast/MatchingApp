@@ -11,6 +11,7 @@ import {
   LocationInput,
   UserDashBoard,
   UserSetting,
+  UserShopSearch,
 } from '../screens';
 import UserProfile from '../screens/user/Profile.user';
 // import Login from '../screens/auth/Login';
@@ -33,9 +34,10 @@ const AppNavigator = () => {
         {/* <Stack.Screen name="NameInput" component={NameInput} /> */}
         {/* <Stack.Screen name="BirthdayInput" component={BirthdayInput} /> */}
         {/* <Stack.Screen name="LocationInput" component={LocationInput} /> */}
-        {/* <Stack.Screen name="UserDashBoard" component={UserDashBoard} /> */}
+        <Stack.Screen name="UserDashBoard" component={UserDashBoard} />
         {/* <Stack.Screen name="UserSetting" component={UserSetting} /> */}
-        <Stack.Screen name="UserProfile" component={UserProfile} />
+        {/* <Stack.Screen name="UserProfile" component={UserProfile} /> */}
+        <Stack.Screen name="UserShopSearch" component={UserShopSearch} />
       </Stack.Navigator>
     </NavigationContainer>
   );
