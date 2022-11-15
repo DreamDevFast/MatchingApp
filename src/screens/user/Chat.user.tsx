@@ -42,6 +42,9 @@ const UserChat = ({navigation, route}: any) => {
             );
           }}
           style={styles.list_item}
+          onPress={() => {
+            console.log('pressed');
+          }}
         />
         <List.Item
           title="Pamela Ramirez"
@@ -73,6 +76,9 @@ const UserChat = ({navigation, route}: any) => {
             );
           }}
           style={styles.list_item}
+          onPress={() => {
+            console.log('pressed');
+          }}
         />
         <List.Item
           title="Pamela Ramirez"
@@ -104,6 +110,9 @@ const UserChat = ({navigation, route}: any) => {
             );
           }}
           style={styles.list_item}
+          onPress={() => {
+            console.log('pressed');
+          }}
         />
         <List.Item
           title="Pamela Ramirez"
@@ -135,6 +144,9 @@ const UserChat = ({navigation, route}: any) => {
             );
           }}
           style={styles.list_item}
+          onPress={() => {
+            console.log('pressed');
+          }}
         />
         <List.Item
           title="Pamela Ramirez"
@@ -166,6 +178,9 @@ const UserChat = ({navigation, route}: any) => {
             );
           }}
           style={styles.list_item}
+          onPress={() => {
+            console.log('pressed');
+          }}
         />
         <List.Item
           title="Pamela Ramirez"
@@ -197,6 +212,9 @@ const UserChat = ({navigation, route}: any) => {
             );
           }}
           style={styles.list_item}
+          onPress={() => {
+            console.log('pressed');
+          }}
         />
         <List.Item
           title="Pamela Ramirez"
@@ -228,6 +246,9 @@ const UserChat = ({navigation, route}: any) => {
             );
           }}
           style={styles.list_item}
+          onPress={() => {
+            console.log('pressed');
+          }}
         />
       </ScrollView>
     </CustomTabnav>

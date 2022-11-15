@@ -8,3 +8,7 @@ export {default as LocationInput} from './auth/LocationInput';
 export {default as UserDashBoard} from './user/DashBoard.user';
 export {default as UserSetting} from './user/Setting.user';
 export {default as UserShopSearch} from './user/ShopSearch.user';
+export {default as UserProfile} from '../screens/user/Profile.user';
+export {default as UserShopDetail} from '../screens/user/ShopDetail.user';
+export {default as UserChat} from '../screens/user/Chat.user';
+export {default as UserChatRoom} from '../screens/user/ChatRoom.user';

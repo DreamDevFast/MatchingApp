@@ -4,6 +4,7 @@ import {
   ScrollView,
   Dimensions,
   ImageBackground,
+  TouchableHighlight,
 } from 'react-native';
 import {View, Button, Text} from 'react-native-ui-lib';
 import {Divider, FAB, IconButton} from 'react-native-paper';
@@ -39,102 +40,102 @@ const UserShopSearch = ({navigation, route}: any) => {
   return (
     <CustomTabnav navigation={navigation} route={route}>
       <ScrollView horizontal={true}>
-        <View>
-          <ImageBackground
-            source={{
-              uri:
-                'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-            }}
-            style={styles.image}
-          >
-            <View
-              style={{...styles.container, ...getBackgroundColor()}}
-              onStartShouldSetResponder={() => {
-                console.log('pressed');
-                return true;
+        <TouchableHighlight
+          onPress={() => {
+            console.log('pressed');
+          }}
+        >
+          <>
+            <ImageBackground
+              source={{
+                uri:
+                  'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
               }}
+              style={styles.image}
             >
-              {state === 'like' ? (
-                <Entypo
-                  name="heart"
-                  color={Colors.white}
-                  size={width * 0.5}
-                  style={styles.reaction_icon}
-                />
-              ) : state === 'dislike' ? (
-                <Entypo
-                  name="cross"
-                  color={Colors.white}
-                  size={width * 0.5}
-                  style={styles.reaction_icon}
-                />
-              ) : (
-                <></>
-              )}
-              <View bottom paddingB-100 marginH-40 style={styles.desc}>
-                <Text style={styles.title}>Mermaid</Text>
-                <Text>
-                  ようこそ！ざっぶーん！ ここは海の中のメイドカフェ＆バー
-                  ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
-                  陸のセカイでの活力になればと願い、
-                  この度新規オープンさせて頂きました★
-                </Text>
-                <Divider style={styles.divider} />
-                <View row marginB-10>
-                  <SimpleLineIcons
-                    name="location-pin"
-                    size={20}
-                    color={Colors.iconLabel}
+              <View style={{...styles.container, ...getBackgroundColor()}}>
+                {state === 'like' ? (
+                  <Entypo
+                    name="heart"
+                    color={Colors.white}
+                    size={width * 0.5}
+                    style={styles.reaction_icon}
                   />
-                  <Text style={styles.label}>池袋</Text>
-                </View>
-                <View row marginB-10>
-                  <MaterialCommunityIcons
-                    name="piggy-bank-outline"
-                    size={20}
-                    color={Colors.iconLabel}
+                ) : state === 'dislike' ? (
+                  <Entypo
+                    name="cross"
+                    color={Colors.white}
+                    size={width * 0.5}
+                    style={styles.reaction_icon}
                   />
-                  <Text style={styles.label}>1,500円〜</Text>
+                ) : (
+                  <></>
+                )}
+                <View bottom paddingB-100 marginH-40 style={styles.desc}>
+                  <Text style={styles.title}>Mermaid</Text>
+                  <Text>
+                    ようこそ！ざっぶーん！ ここは海の中のメイドカフェ＆バー
+                    ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
+                    陸のセカイでの活力になればと願い、
+                    この度新規オープンさせて頂きました★
+                  </Text>
+                  <Divider style={styles.divider} />
+                  <View row marginB-10>
+                    <SimpleLineIcons
+                      name="location-pin"
+                      size={20}
+                      color={Colors.iconLabel}
+                    />
+                    <Text style={styles.label}>池袋</Text>
+                  </View>
+                  <View row marginB-10>
+                    <MaterialCommunityIcons
+                      name="piggy-bank-outline"
+                      size={20}
+                      color={Colors.iconLabel}
+                    />
+                    <Text style={styles.label}>1,500円〜</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          </ImageBackground>
-          <IconButton
-            icon="undo"
-            color={Colors.white}
-            style={styles.return}
-            size={15}
-            onPress={() => console.log('Pressed')}
-          />
-          <IconButton
-            icon="times"
-            color={Colors.white}
-            style={styles.dislike}
-            size={20}
-            onPress={() => setState('dislike')}
-          />
-          <IconButton
-            icon="star"
-            color={Colors.white}
-            style={styles.favorite}
-            size={15}
-            onPress={() => console.log('Pressed')}
-          />
-          <IconButton
-            icon="heart"
-            color={Colors.white}
-            style={styles.like}
-            size={20}
-            onPress={() => setState('like')}
-          />
-          <IconButton
-            icon="bolt"
-            color={Colors.white}
-            style={styles.boost}
-            size={15}
-            onPress={() => console.log('Pressed')}
-          />
-        </View>
+            </ImageBackground>
+            <IconButton
+              icon="undo"
+              color={Colors.white}
+              style={styles.return}
+              size={15}
+              onPress={() => console.log('Pressed')}
+            />
+            <IconButton
+              icon="times"
+              color={Colors.white}
+              style={styles.dislike}
+              size={20}
+              onPress={() => setState('dislike')}
+            />
+            <IconButton
+              icon="star"
+              color={Colors.white}
+              style={styles.favorite}
+              size={15}
+              onPress={() => console.log('Pressed')}
+            />
+            <IconButton
+              icon="heart"
+              color={Colors.white}
+              style={styles.like}
+              size={20}
+              onPress={() => setState('like')}
+            />
+            <IconButton
+              icon="bolt"
+              color={Colors.white}
+              style={styles.boost}
+              size={15}
+              onPress={() => console.log('Pressed')}
+            />
+          </>
+        </TouchableHighlight>
         <View>
           <ImageBackground
             source={{
