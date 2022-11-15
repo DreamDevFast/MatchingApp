@@ -10,7 +10,7 @@ type Props = {
   props?: any;
 };
 
-const CustomButton = ({label, color, mode, ...props}: Props) => {
+const CustomButton = ({label, color, mode, ...props}: any) => {
   if (color === undefined) {
     color = Colors.redBtn;
   }

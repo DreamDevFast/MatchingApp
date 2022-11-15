@@ -1,14 +1,21 @@
 import React, {useState} from 'react';
 import {View} from 'react-native-ui-lib';
 import {StyleSheet} from 'react-native';
-import {TextInput} from 'react-native-paper';
+import {TextInput, IconButton} from 'react-native-paper';
 
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
-const ConfirmCode = () => {
+const ConfirmCode = ({navigation}: any) => {
   return (
     <Container bottom centerH>
+      <IconButton
+        icon="chevron-left"
+        color={Colors.redBtn}
+        style={styles.backIcon}
+        size={30}
+        onPress={() => navigation.goBack()}
+      />
       <CustomText marginB-30 style={styles.confirmLabel}>
         認証コード
       </CustomText>
@@ -50,7 +57,10 @@ const ConfirmCode = () => {
           theme={{colors: {text: Colors.white}}}
         />
       </View>
-      <CustomButton label="次へ" />
+      <CustomButton
+        label="次へ"
+        onPress={() => navigation.navigate('NameInput')}
+      />
       <CustomText marginB-40 marginT-10>
         認証コードの再送信をリクエストする
       </CustomText>
@@ -59,6 +69,11 @@ const ConfirmCode = () => {
 };
 
 const styles = StyleSheet.create({
+  backIcon: {
+    position: 'absolute',
+    left: 0,
+    top: 30,
+  },
   confirmLabel: {
     width: '80%',
   },

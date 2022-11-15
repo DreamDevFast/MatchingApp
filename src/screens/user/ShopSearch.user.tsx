@@ -42,7 +42,7 @@ const UserShopSearch = ({navigation, route}: any) => {
       <ScrollView horizontal={true}>
         <TouchableHighlight
           onPress={() => {
-            console.log('pressed');
+            navigation.navigate('UserShopDetail');
           }}
         >
           <>

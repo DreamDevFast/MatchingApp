@@ -1,15 +1,22 @@
 import React, {useState} from 'react';
-import {StyleSheet} from 'react-native';
-import {TextInput} from 'react-native-paper';
+import {StyleSheet, TouchableHighlight} from 'react-native';
+import {TextInput, IconButton} from 'react-native-paper';
 import {View} from 'react-native-ui-lib';
 import {Container, CustomButton, CustomText} from '../../components';
 import {Colors} from '../../styles';
 
-const Login = () => {
+const Login = ({navigation}: any) => {
   const [loginMethod, setLoginMethod] = useState<'email' | 'mobile'>('mobile'); // 'email' or 'mobile'
 
   return (
     <Container bottom centerH>
+      <IconButton
+        icon="chevron-left"
+        color={Colors.redBtn}
+        style={styles.backIcon}
+        size={30}
+        onPress={() => navigation.goBack()}
+      />
       {loginMethod === 'email' ? (
         <>
           <CustomText marginB-10>メールアドレスを入力してください</CustomText>
@@ -19,10 +26,17 @@ const Login = () => {
             style={{...styles.emailInput}}
             theme={{colors: {text: Colors.white}}}
           />
-          <CustomButton label="次へ" />
-          <CustomText marginB-40 marginT-10>
-            電話番号でログイン
-          </CustomText>
+          <CustomButton
+            label="次へ"
+            onPress={() => {
+              navigation.navigate('Register');
+            }}
+          />
+          <View marginT-10></View>
+          <TouchableHighlight onPress={() => setLoginMethod('mobile')}>
+            <CustomText>電話番号でログイン</CustomText>
+          </TouchableHighlight>
+          <View marginB-40></View>
         </>
       ) : (
         <>
@@ -33,6 +47,7 @@ const Login = () => {
               activeUnderlineColor={Colors.redBtn}
               style={{...styles.phonePrefixInput}}
               theme={{colors: {text: Colors.white}}}
+              value={'+81'}
             />
             <TextInput
               underlineColor={Colors.redBtn}
@@ -41,10 +56,17 @@ const Login = () => {
               theme={{colors: {text: Colors.white}}}
             />
           </View>
-          <CustomButton label="次へ" />
-          <CustomText marginB-40 marginT-10>
-            メールアドレスでログイン
-          </CustomText>
+          <CustomButton
+            label="次へ"
+            onPress={() => {
+              navigation.navigate('Register');
+            }}
+          />
+          <View marginT-10></View>
+          <TouchableHighlight onPress={() => setLoginMethod('email')}>
+            <CustomText>メールアドレスでログイン</CustomText>
+          </TouchableHighlight>
+          <View marginB-40></View>
         </>
       )}
     </Container>
@@ -52,21 +74,26 @@ const Login = () => {
 };
 
 const styles = StyleSheet.create({
+  backIcon: {
+    position: 'absolute',
+    left: 0,
+    top: 30,
+  },
   emailInput: {
     height: 30,
-    width: '70%',
+    width: '80%',
     marginBottom: 100,
     backgroundColor: Colors.back,
   },
   phonePrefixInput: {
     height: 30,
-    width: '10%',
+    width: '13%',
     marginBottom: 100,
     backgroundColor: Colors.back,
   },
   phoneNumberInput: {
     height: 30,
-    width: '57%',
+    width: '64%',
     marginLeft: '3%',
     marginBottom: 100,
     backgroundColor: Colors.back,

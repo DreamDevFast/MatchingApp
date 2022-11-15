@@ -43,7 +43,7 @@ const UserChat = ({navigation, route}: any) => {
           }}
           style={styles.list_item}
           onPress={() => {
-            console.log('pressed');
+            navigation.navigate('UserChatRoom');
           }}
         />
         <List.Item
@@ -77,7 +77,7 @@ const UserChat = ({navigation, route}: any) => {
           }}
           style={styles.list_item}
           onPress={() => {
-            console.log('pressed');
+            navigation.navigate('UserChatRoom');
           }}
         />
         <List.Item
@@ -111,7 +111,7 @@ const UserChat = ({navigation, route}: any) => {
           }}
           style={styles.list_item}
           onPress={() => {
-            console.log('pressed');
+            navigation.navigate('UserChatRoom');
           }}
         />
         <List.Item
@@ -145,7 +145,7 @@ const UserChat = ({navigation, route}: any) => {
           }}
           style={styles.list_item}
           onPress={() => {
-            console.log('pressed');
+            navigation.navigate('UserChatRoom');
           }}
         />
         <List.Item
@@ -179,7 +179,7 @@ const UserChat = ({navigation, route}: any) => {
           }}
           style={styles.list_item}
           onPress={() => {
-            console.log('pressed');
+            navigation.navigate('UserChatRoom');
           }}
         />
         <List.Item
@@ -213,7 +213,7 @@ const UserChat = ({navigation, route}: any) => {
           }}
           style={styles.list_item}
           onPress={() => {
-            console.log('pressed');
+            navigation.navigate('UserChatRoom');
           }}
         />
         <List.Item
@@ -247,7 +247,7 @@ const UserChat = ({navigation, route}: any) => {
           }}
           style={styles.list_item}
           onPress={() => {
-            console.log('pressed');
+            navigation.navigate('UserChatRoom');
           }}
         />
       </ScrollView>

@@ -31,19 +31,19 @@ const AppNavigator = () => {
           presentation: 'card',
         }}
       >
-        {/* <Stack.Screen name="Home" component={FirstScreen} /> */}
-        {/* <Stack.Screen name="Login" component={Login} /> */}
-        {/* <Stack.Screen name="Register" component={Register} /> */}
-        {/* <Stack.Screen name="ConfirmCode" component={ConfirmCode} /> */}
-        {/* <Stack.Screen name="NameInput" component={NameInput} /> */}
-        {/* <Stack.Screen name="BirthdayInput" component={BirthdayInput} /> */}
-        {/* <Stack.Screen name="LocationInput" component={LocationInput} /> */}
-        {/* <Stack.Screen name="UserDashBoard" component={UserDashBoard} /> */}
-        {/* <Stack.Screen name="UserSetting" component={UserSetting} /> */}
-        {/* <Stack.Screen name="UserProfile" component={UserProfile} /> */}
-        {/* <Stack.Screen name="UserShopSearch" component={UserShopSearch} /> */}
-        {/* <Stack.Screen name="UserShopDetail" component={UserShopDetail} /> */}
-        {/* <Stack.Screen name="UserChat" component={UserChat} /> */}
+        <Stack.Screen name="Home" component={FirstScreen} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="ConfirmCode" component={ConfirmCode} />
+        <Stack.Screen name="NameInput" component={NameInput} />
+        <Stack.Screen name="BirthdayInput" component={BirthdayInput} />
+        <Stack.Screen name="LocationInput" component={LocationInput} />
+        <Stack.Screen name="UserDashBoard" component={UserDashBoard} />
+        <Stack.Screen name="UserSetting" component={UserSetting} />
+        <Stack.Screen name="UserProfile" component={UserProfile} />
+        <Stack.Screen name="UserShopSearch" component={UserShopSearch} />
+        <Stack.Screen name="UserShopDetail" component={UserShopDetail} />
+        <Stack.Screen name="UserChat" component={UserChat} />
         <Stack.Screen name="UserChatRoom" component={UserChatRoom} />
       </Stack.Navigator>
     </NavigationContainer>

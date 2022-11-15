@@ -1,14 +1,14 @@
 import React, {useState, useCallback} from 'react';
 import {View} from 'react-native-ui-lib';
 import {StyleSheet} from 'react-native';
-import {TextInput} from 'react-native-paper';
+import {TextInput, IconButton} from 'react-native-paper';
 import {Dropdown} from 'react-native-element-dropdown';
 
 import {pref_city} from '../../constants/config';
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
-const LocationInput = () => {
+const LocationInput = ({navigation}: any) => {
   const [profile, setProfile] = useState({
     prefectures: null,
   });
@@ -20,6 +20,13 @@ const LocationInput = () => {
   );
   return (
     <Container bottom centerH>
+      <IconButton
+        icon="chevron-left"
+        color={Colors.redBtn}
+        style={styles.backIcon}
+        size={30}
+        onPress={() => navigation.goBack()}
+      />
       <CustomText marginB-40>住所を入力してください</CustomText>
       <CustomText style={styles.confirmLabel}>お住まいのエリア</CustomText>
       <Dropdown
@@ -46,13 +53,21 @@ const LocationInput = () => {
         style={{...styles.address}}
         theme={{colors: {text: Colors.white}}}
       />
-      <CustomButton label="次へ" />
+      <CustomButton
+        label="次へ"
+        onPress={() => navigation.navigate('UserDashBoard')}
+      />
       <View marginB-100></View>
     </Container>
   );
 };
 
 const styles = StyleSheet.create({
+  backIcon: {
+    position: 'absolute',
+    left: 0,
+    top: 30,
+  },
   confirmLabel: {
     width: '80%',
   },
