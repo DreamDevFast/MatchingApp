@@ -2,11 +2,16 @@ import React, {useState} from 'react';
 import {IconButton} from 'react-native-paper';
 import {StyleSheet, TouchableHighlight} from 'react-native';
 import {View} from 'react-native-ui-lib';
+
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+import {setLoginMethod} from '../../redux/features/globalSlice';
+
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
 const Register = ({navigation}: any) => {
-  const [loginMethod, setLoginMethod] = useState<'email' | 'mobile'>('mobile'); // 'email' or 'mobile'
+  const loginMethod = useAppSelector((state: any) => state.global.loginMethod); // 'mobile' or 'email'
+  const dispatch = useAppDispatch();
 
   return (
     <Container bottom centerH>
@@ -20,21 +25,6 @@ const Register = ({navigation}: any) => {
       {loginMethod === 'email' ? (
         <>
           <CustomText marginB-200>
-            この電話番号は登録されていません 新規登録いたしますか？
-          </CustomText>
-          <CustomButton
-            label="はい"
-            onPress={() => navigation.navigate('ConfirmCode')}
-          />
-          <View marginT-10></View>
-          <TouchableHighlight onPress={() => setLoginMethod('mobile')}>
-            <CustomText>メールアドレスで登録</CustomText>
-          </TouchableHighlight>
-          <View marginB-40></View>
-        </>
-      ) : (
-        <>
-          <CustomText marginB-200>
             このメールアドレスは登録されていません 新規登録いたしますか？
           </CustomText>
           <CustomButton
@@ -42,7 +32,24 @@ const Register = ({navigation}: any) => {
             onPress={() => navigation.navigate('ConfirmCode')}
           />
           <View marginT-10></View>
-          <TouchableHighlight onPress={() => setLoginMethod('email')}>
+          <TouchableHighlight
+            onPress={() => dispatch(setLoginMethod('mobile'))}
+          >
+            <CustomText>メールアドレスで登録</CustomText>
+          </TouchableHighlight>
+          <View marginB-40></View>
+        </>
+      ) : (
+        <>
+          <CustomText marginB-200>
+            この電話番号は登録されていません 新規登録いたしますか？
+          </CustomText>
+          <CustomButton
+            label="はい"
+            onPress={() => navigation.navigate('ConfirmCode')}
+          />
+          <View marginT-10></View>
+          <TouchableHighlight onPress={() => dispatch(setLoginMethod('email'))}>
             <CustomText>電話番号で登録</CustomText>
           </TouchableHighlight>
           <View marginB-40></View>

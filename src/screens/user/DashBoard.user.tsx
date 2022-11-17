@@ -1,24 +1,25 @@
 import React, {useState} from 'react';
 import {StyleSheet, Pressable} from 'react-native';
-import {IconButton, Avatar, Modal} from 'react-native-paper';
+import {IconButton, Modal} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-crop-picker';
 import {CustomButton, Container, CustomText} from '../../components';
 import {Colors} from '../../styles';
-import {Text, View} from 'react-native-ui-lib';
+import {Text, View, Avatar} from 'react-native-ui-lib';
 import UserShopSearch from './ShopSearch.user';
 import CustomTabnav from '../../components/CustomTabnav';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 import {setTempUser} from '../../redux/features/globalSlice';
 
+const userIcon = require('../../assets/images/user.png');
+
 const DefaultTab = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
   const dispatch = useAppDispatch();
 
   const [profile, setProfile] = useState({
-    avatar:
-      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+    avatar: 'default.png',
   });
   const [openImagePickerModal, setOpenImagePickerModal] = useState<boolean>(
     false,
@@ -70,11 +71,11 @@ const DefaultTab = ({navigation}: any) => {
   return (
     <>
       <View marginT-30>
-        {profile.avatar === 'default.png' ? (
-          <Avatar.Icon size={250} icon="user" />
-        ) : (
-          <Avatar.Image size={250} source={{uri: profile.avatar}} />
-        )}
+        <Avatar
+          size={250}
+          source={profile.avatar === 'default.png' ? userIcon : profile.avatar}
+          label={'IMG'}
+        />
       </View>
       <View row spread marginT-10 style={styles.toolBar1}>
         <View centerH>

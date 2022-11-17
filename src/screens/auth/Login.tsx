@@ -2,11 +2,64 @@ import React, {useState} from 'react';
 import {StyleSheet, TouchableHighlight} from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
 import {View} from 'react-native-ui-lib';
+
+import firestore from '@react-native-firebase/firestore';
+
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+import {
+  setAuthenticated,
+  setLoginMethod,
+  setTempUser,
+} from '../../redux/features/globalSlice';
+
 import {Container, CustomButton, CustomText} from '../../components';
 import {Colors} from '../../styles';
 
 const Login = ({navigation}: any) => {
-  const [loginMethod, setLoginMethod] = useState<'email' | 'mobile'>('mobile'); // 'email' or 'mobile'
+  const loginMethod = useAppSelector((state: any) => state.global.loginMethod); // 'mobile' or 'email'
+  const dispatch = useAppDispatch();
+
+  const [email, setEmail] = useState<string>('');
+  const [mobile, setMobile] = useState<string>('');
+
+  const handleLogin = () => {
+    const operator = loginMethod === 'email' ? email : mobile;
+    firestore()
+      .collection('Users')
+      .where(loginMethod, '==', operator)
+      .get()
+      .then(querySnapshot => {
+        if (querySnapshot.size === 1) {
+          console.log(querySnapshot.docs[0].data());
+          let {
+            address,
+            birthday,
+            email,
+            name,
+            mobile,
+            prefecture,
+            role,
+          } = querySnapshot.docs[0].data();
+
+          birthday = new Date(birthday.seconds * 1000).toString();
+          dispatch(
+            setTempUser({
+              address,
+              birthday,
+              email,
+              name,
+              mobile,
+              prefecture,
+              role,
+            }),
+          );
+          dispatch(setAuthenticated(true));
+          navigation.navigate('UserDashBoard');
+        } else {
+          navigation.navigate('Register');
+        }
+      });
+  };
 
   return (
     <Container bottom centerH>
@@ -25,15 +78,14 @@ const Login = ({navigation}: any) => {
             activeUnderlineColor={Colors.redBtn}
             style={{...styles.emailInput}}
             theme={{colors: {text: Colors.white}}}
+            value={email}
+            onChangeText={text => setEmail(text)}
           />
-          <CustomButton
-            label="次へ"
-            onPress={() => {
-              navigation.navigate('Register');
-            }}
-          />
+          <CustomButton label="次へ" onPress={handleLogin} />
           <View marginT-10></View>
-          <TouchableHighlight onPress={() => setLoginMethod('mobile')}>
+          <TouchableHighlight
+            onPress={() => dispatch(setLoginMethod('mobile'))}
+          >
             <CustomText>電話番号でログイン</CustomText>
           </TouchableHighlight>
           <View marginB-40></View>
@@ -54,16 +106,13 @@ const Login = ({navigation}: any) => {
               activeUnderlineColor={Colors.redBtn}
               style={{...styles.phoneNumberInput}}
               theme={{colors: {text: Colors.white}}}
+              value={mobile}
+              onChangeText={text => setMobile(text)}
             />
           </View>
-          <CustomButton
-            label="次へ"
-            onPress={() => {
-              navigation.navigate('Register');
-            }}
-          />
+          <CustomButton label="次へ" onPress={handleLogin} />
           <View marginT-10></View>
-          <TouchableHighlight onPress={() => setLoginMethod('email')}>
+          <TouchableHighlight onPress={() => dispatch(setLoginMethod('email'))}>
             <CustomText>メールアドレスでログイン</CustomText>
           </TouchableHighlight>
           <View marginB-40></View>
