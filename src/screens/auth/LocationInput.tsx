@@ -3,6 +3,7 @@ import {View} from 'react-native-ui-lib';
 import {StyleSheet} from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
 import {Dropdown} from 'react-native-element-dropdown';
+import firestore from '@react-native-firebase/firestore';
 
 import {pref_city} from '../../constants/config';
 import {Colors} from '../../styles';
@@ -14,6 +15,7 @@ import {setTempUser} from '../../redux/features/globalSlice';
 const LocationInput = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
   const dispatch = useAppDispatch();
+  const users = firestore().collection('Users');
 
   const handlePrefecture = (item: any) => {
     dispatch(
@@ -33,6 +35,20 @@ const LocationInput = ({navigation}: any) => {
     );
   };
 
+  const register = async () => {
+    // TODO register user with firestore
+    const {name, birthday, prefecture, address} = tempUser;
+
+    await users.add({
+      name,
+      birthday: new Date(birthday),
+      prefecture,
+      address,
+    });
+
+    console.log('save succeeded!');
+    navigation.navigate('UserDashBoard');
+  };
   return (
     <Container bottom centerH>
       <IconButton
@@ -67,10 +83,7 @@ const LocationInput = ({navigation}: any) => {
         value={tempUser.address}
         onChangeText={handleAddress}
       />
-      <CustomButton
-        label="次へ"
-        onPress={() => navigation.navigate('UserDashBoard')}
-      />
+      <CustomButton label="次へ" onPress={register} />
       <View marginB-100></View>
     </Container>
   );
