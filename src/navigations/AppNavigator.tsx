@@ -16,6 +16,7 @@ import {
   UserShopDetail,
   UserChat,
   UserChatRoom,
+  PhoneVerification,
 } from '../screens';
 
 // import Login from '../screens/auth/Login';
@@ -31,6 +32,10 @@ const AppNavigator = () => {
           presentation: 'card',
         }}
       >
+        {/* <Stack.Screen
+          name="PhoneVerificationSample"
+          component={PhoneVerification}
+        /> */}
         <Stack.Screen name="Home" component={FirstScreen} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />

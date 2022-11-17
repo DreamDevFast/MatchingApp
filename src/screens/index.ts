@@ -12,3 +12,4 @@ export {default as UserProfile} from '../screens/user/Profile.user';
 export {default as UserShopDetail} from '../screens/user/ShopDetail.user';
 export {default as UserChat} from '../screens/user/Chat.user';
 export {default as UserChatRoom} from '../screens/user/ChatRoom.user';
+export {default as PhoneVerification} from './auth/PhoneVerificationSample';

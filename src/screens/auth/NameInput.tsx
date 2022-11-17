@@ -6,7 +6,22 @@ import {StyleSheet} from 'react-native';
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+import {setTempUser} from '../../redux/features/globalSlice';
+
 const NameInput = ({navigation}: any) => {
+  const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const dispatch = useAppDispatch();
+
+  const handleNameInput = (name: string) => {
+    dispatch(
+      setTempUser({
+        ...tempUser,
+        name,
+      }),
+    );
+  };
+
   return (
     <Container bottom centerH>
       <IconButton
@@ -24,6 +39,8 @@ const NameInput = ({navigation}: any) => {
         activeUnderlineColor={Colors.redBtn}
         style={{...styles.nameInput}}
         theme={{colors: {text: Colors.white}}}
+        value={tempUser.name}
+        onChangeText={handleNameInput}
       />
       <CustomButton
         label="次へ"

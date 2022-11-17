@@ -9,7 +9,13 @@ import {Text, View} from 'react-native-ui-lib';
 import UserShopSearch from './ShopSearch.user';
 import CustomTabnav from '../../components/CustomTabnav';
 
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+import {setTempUser} from '../../redux/features/globalSlice';
+
 const DefaultTab = ({navigation}: any) => {
+  const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const dispatch = useAppDispatch();
+
   const [profile, setProfile] = useState({
     avatar:
       'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',

@@ -8,16 +8,31 @@ import {pref_city} from '../../constants/config';
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+import {setTempUser} from '../../redux/features/globalSlice';
+
 const LocationInput = ({navigation}: any) => {
-  const [profile, setProfile] = useState({
-    prefectures: null,
-  });
-  const handleChangeProfile = useCallback(
-    (key: any) => (value: any) => {
-      setProfile(state => ({...state, [key]: value}));
-    },
-    [profile],
-  );
+  const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const dispatch = useAppDispatch();
+
+  const handlePrefecture = (item: any) => {
+    dispatch(
+      setTempUser({
+        ...tempUser,
+        prefecture: item.value,
+      }),
+    );
+  };
+
+  const handleAddress = (address: string) => {
+    dispatch(
+      setTempUser({
+        ...tempUser,
+        address,
+      }),
+    );
+  };
+
   return (
     <Container bottom centerH>
       <IconButton
@@ -41,17 +56,16 @@ const LocationInput = ({navigation}: any) => {
         valueField="value"
         placeholder={''}
         searchPlaceholder={''}
-        onChangeText={handleChangeProfile('prefectures')}
-        onChange={item => {
-          handleChangeProfile({prefectures: item.value});
-        }}
-        value={profile.prefectures}
+        onChange={handlePrefecture}
+        value={tempUser.prefecture}
       />
       <TextInput
         underlineColor={Colors.redBtn}
         activeUnderlineColor={Colors.redBtn}
         style={{...styles.address}}
         theme={{colors: {text: Colors.white}}}
+        value={tempUser.address}
+        onChangeText={handleAddress}
       />
       <CustomButton
         label="次へ"

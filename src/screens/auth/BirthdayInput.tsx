@@ -7,7 +7,22 @@ import {IconButton} from 'react-native-paper';
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+import {setTempUser} from '../../redux/features/globalSlice';
+
 const BirthdayInput = ({navigation}: any) => {
+  const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const dispatch = useAppDispatch();
+
+  const handleDate = (date: Date) => {
+    dispatch(
+      setTempUser({
+        ...tempUser,
+        birthday: date.toString(),
+      }),
+    );
+  };
+
   return (
     <Container bottom centerH>
       <IconButton
@@ -17,15 +32,16 @@ const BirthdayInput = ({navigation}: any) => {
         size={30}
         onPress={() => navigation.goBack()}
       />
-      <CustomText marginB-30>誕生日を入力してください </CustomText>
+      <CustomText marginB-30>誕生日を入力してください</CustomText>
       <DatePicker
         title={'birthday'}
-        date={new Date()}
+        date={new Date(tempUser.birthday)}
         open={false}
         mode={'date'}
         locale={'ja'}
         fadeToColor={Colors.back}
         textColor={Colors.white}
+        onDateChange={handleDate}
       />
       <View marginB-30></View>
       <CustomButton
