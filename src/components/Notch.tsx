@@ -1,6 +1,8 @@
 import React, {memo} from 'react';
 import {View, StyleSheet} from 'react-native';
 
+import {Colors} from '../styles';
+
 const Notch = (props: any) => {
   return <View style={styles.root} {...props} />;
 };
@@ -13,7 +15,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: '#4499ff',
+    borderTopColor: Colors.redBtn,
     borderLeftWidth: 4,
     borderRightWidth: 4,
     borderTopWidth: 8,
