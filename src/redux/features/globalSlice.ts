@@ -3,12 +3,14 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import type {AppState} from '../store';
 
 export type TempUser = {
+  id: string;
   email: string;
   mobile: string;
   name: string;
   birthday: string;
   prefecture: number;
   address: string;
+  avatar: string;
   role: 'girl' | 'shop';
 };
 
@@ -23,12 +25,14 @@ const initialState: GlobalState = {
   isLoading: false,
   isAuthenticated: false,
   tempUser: {
+    id: '',
     email: '',
     mobile: '',
     name: '',
     birthday: new Date().toString(),
     prefecture: 0,
     address: '',
+    avatar: 'default.png',
     role: 'girl',
   },
   loginMethod: 'email',
@@ -37,12 +41,14 @@ const initialState: GlobalState = {
 type setLoginMethodPayload = 'email' | 'mobile';
 
 type setTempUserPayload = {
-  email: '';
-  mobile: '';
+  id: string;
+  email: string;
+  mobile: string;
   name: string;
   birthday: string;
   prefecture: number;
   address: string;
+  avatar: string;
   role: 'girl' | 'shop';
 };
 

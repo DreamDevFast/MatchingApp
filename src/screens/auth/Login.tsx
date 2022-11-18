@@ -39,11 +39,13 @@ const Login = ({navigation}: any) => {
             mobile,
             prefecture,
             role,
+            avatar,
           } = querySnapshot.docs[0].data();
 
           birthday = new Date(birthday.seconds * 1000).toString();
           dispatch(
             setTempUser({
+              id: querySnapshot.docs[0].id,
               address,
               birthday,
               email,
@@ -51,6 +53,7 @@ const Login = ({navigation}: any) => {
               mobile,
               prefecture,
               role,
+              avatar,
             }),
           );
           dispatch(setAuthenticated(true));

@@ -37,7 +37,16 @@ const LocationInput = ({navigation}: any) => {
 
   const register = async () => {
     // TODO register user with firestore
-    const {name, birthday, prefecture, address, email, mobile, role} = tempUser;
+    const {
+      name,
+      birthday,
+      prefecture,
+      address,
+      email,
+      mobile,
+      role,
+      avatar,
+    } = tempUser;
 
     await users.add({
       email,
@@ -46,6 +55,7 @@ const LocationInput = ({navigation}: any) => {
       birthday: new Date(birthday),
       prefecture,
       address,
+      avatar,
       role,
     });
 

@@ -1,8 +1,12 @@
 import React, {useState} from 'react';
-import {StyleSheet, Pressable} from 'react-native';
+import {StyleSheet, Pressable, Platform} from 'react-native';
 import {IconButton, Modal} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-crop-picker';
+
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+
 import {CustomButton, Container, CustomText} from '../../components';
 import {Colors} from '../../styles';
 import {Text, View, Avatar} from 'react-native-ui-lib';
@@ -10,40 +14,59 @@ import UserShopSearch from './ShopSearch.user';
 import CustomTabnav from '../../components/CustomTabnav';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
-import {setTempUser} from '../../redux/features/globalSlice';
+import {setTempUser, setLoading} from '../../redux/features/globalSlice';
+import Loader from '../../components/Loader';
 
 const userIcon = require('../../assets/images/user.png');
 
 const DefaultTab = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const isLoading = useAppSelector((state: any) => state.global.isLoading);
+
   const dispatch = useAppDispatch();
 
-  const [profile, setProfile] = useState({
-    avatar: 'default.png',
-  });
   const [openImagePickerModal, setOpenImagePickerModal] = useState<boolean>(
     false,
   );
 
-  const handleProfileChange = (key: string) => (value: any) => {
-    setProfile({
-      ...profile,
-      [key]: value,
-    });
+  const handleAvatar = async (avatar: string) => {
+    try {
+      await firestore().collection('Users').doc(tempUser.id).update({avatar});
+      console.log('updated');
+      dispatch(
+        setTempUser({
+          ...tempUser,
+          avatar,
+        }),
+      );
+    } catch (err) {
+      console.log('update avatar error: ', err);
+    }
   };
+
   const pickPictureOnGallery = () => {
     ImagePicker.openPicker({
       width: 800,
       height: 600,
       cropping: true,
     })
-      .then(image => {
-        handleProfileChange('avatar')({
-          uri: image.path,
-          type: image.mime,
-          size: image.size,
-        });
+      .then(async image => {
+        dispatch(setLoading(true));
         setOpenImagePickerModal(false);
+        const now = Date.now();
+
+        const filenameInStore = `${tempUser.name}-${now}.png`;
+        const reference = storage().ref(filenameInStore);
+        await reference.putFile(
+          Platform.OS === 'ios'
+            ? image.path.replace('file://', '')
+            : image.path,
+        );
+        const url = await storage().ref(filenameInStore).getDownloadURL();
+
+        await handleAvatar(url);
+
+        dispatch(setLoading(false));
       })
       .catch(err => {
         setOpenImagePickerModal(false);
@@ -56,24 +79,41 @@ const DefaultTab = ({navigation}: any) => {
       height: 600,
       cropping: true,
     })
-      .then(image => {
-        handleProfileChange('avatar')({
-          uri: image.path,
-          type: image.mime,
-          size: image.size,
-        });
+      .then(async image => {
+        dispatch(setLoading(true));
         setOpenImagePickerModal(false);
+        const now = Date.now();
+
+        const filenameInStore = `${tempUser.name}-${now}.png`;
+        const reference = storage().ref(filenameInStore);
+        await reference.putFile(
+          Platform.OS === 'ios'
+            ? image.path.replace('file://', '')
+            : image.path,
+        );
+        const url = await storage().ref(filenameInStore).getDownloadURL();
+
+        await handleAvatar(url);
+
+        dispatch(setLoading(false));
       })
       .catch(err => {
         setOpenImagePickerModal(false);
       });
   };
+
+  console.log(isLoading);
   return (
     <>
+      <Loader isLoading={isLoading} />
       <View marginT-30>
         <Avatar
           size={250}
-          source={profile.avatar === 'default.png' ? userIcon : profile.avatar}
+          source={
+            tempUser.avatar === 'default.png' || '' || undefined
+              ? userIcon
+              : {uri: tempUser.avatar}
+          }
           label={'IMG'}
         />
       </View>
