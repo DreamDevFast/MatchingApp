@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {View} from 'react-native-ui-lib';
 import {StyleSheet} from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
@@ -10,11 +10,13 @@ import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
-import {setTempUser} from '../../redux/features/globalSlice';
+import {setAuthenticated, setTempUser} from '../../redux/features/globalSlice';
 
 const LocationInput = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
+
   const dispatch = useAppDispatch();
+
   const users = firestore().collection('Users');
 
   const handlePrefecture = (item: any) => {
@@ -48,7 +50,7 @@ const LocationInput = ({navigation}: any) => {
       avatar,
     } = tempUser;
 
-    await users.add({
+    const documentSnapShot = await users.add({
       email,
       mobile,
       name,
@@ -59,7 +61,21 @@ const LocationInput = ({navigation}: any) => {
       role,
     });
 
-    console.log('save succeeded!');
+    console.log('save succeeded!', documentSnapShot.id);
+    dispatch(
+      setTempUser({
+        id: documentSnapShot.id,
+        email,
+        mobile,
+        name,
+        birthday: new Date(birthday).toString(),
+        prefecture,
+        address,
+        avatar,
+        role,
+      }),
+    );
+    dispatch(setAuthenticated(true));
     navigation.navigate('UserDashBoard');
   };
   return (
@@ -118,7 +134,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
     marginBottom: 50,
     marginTop: 20,
-    backgroundColor: Colors.back,
+    backgroundColor: 'transparent',
   },
   dropdown: {
     height: 30,
@@ -127,7 +143,7 @@ const styles = StyleSheet.create({
     width: '80%',
     marginTop: 15,
     marginBottom: 5,
-    borderBottomColor: '#4CAF50',
+    borderBottomColor: Colors.white,
     borderBottomWidth: 1,
   },
   inputSearchStyle: {

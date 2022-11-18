@@ -22,8 +22,11 @@ import RailSelected from '../../components/RailSelected';
 import Notch from '../../components/Notch';
 import Label from '../../components/Label';
 
+import Loader from '../../components/Loader';
+
 const UserSetting = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const isLoading = useAppSelector((state: any) => state.global.isLoading);
   const setting = useAppSelector((state: any) => state.setting);
   const [email, SetEmail] = useState<string>(tempUser.email);
   const [mobile, SetMobile] = useState<string>(tempUser.mobile);
@@ -56,6 +59,7 @@ const UserSetting = ({navigation}: any) => {
   }, []);
 
   const saveAndReturn = async () => {
+    dispatch(setLoading(true));
     try {
       await firestore().collection('Users').doc(tempUser.id).update({
         email,
@@ -85,6 +89,8 @@ const UserSetting = ({navigation}: any) => {
             priceRange,
           }),
         );
+        dispatch(setLoading(false));
+
         navigation.navigate('UserDashBoard');
       } else if (setting.id === tempUser.id) {
         await firestore().collection('Settings').doc(setting.id).update({
@@ -103,12 +109,16 @@ const UserSetting = ({navigation}: any) => {
             priceRange,
           }),
         );
+        dispatch(setLoading(false));
+
+        navigation.navigate('UserDashBoard');
       } else {
         console.log('setting id is NOT equal to tempUser id');
       }
     } catch (err) {
       console.log('Create or Update "Settings" collection error: ', err);
     }
+    dispatch(setLoading(false));
   };
 
   const handleUserInfo = useCallback(
@@ -135,6 +145,7 @@ const UserSetting = ({navigation}: any) => {
 
   return (
     <Container centerH>
+      <Loader isLoading={isLoading} />
       <ScrollView style={{width: '100%'}}>
         <View centerH>
           <IconButton

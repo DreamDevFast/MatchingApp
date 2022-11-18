@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {StyleSheet, Pressable, Platform} from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {StyleSheet, Pressable, Platform, BackHandler} from 'react-native';
 import {IconButton, Modal} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -16,6 +16,7 @@ import CustomTabnav from '../../components/CustomTabnav';
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 import {setTempUser, setLoading} from '../../redux/features/globalSlice';
 import Loader from '../../components/Loader';
+import {useFocusEffect} from '@react-navigation/native';
 
 const userIcon = require('../../assets/images/user.png');
 
@@ -29,6 +30,22 @@ const DefaultTab = ({navigation}: any) => {
     false,
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      // BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+      // return () => {
+      //   BackHandler.removeEventListener(
+      //     'hardwareBackPress',
+      //     handleBackButtonClick,
+      //   );
+      // };
+    }, []),
+  );
+
+  const handleBackButtonClick = () => {
+    console.log('back button pressed');
+    return true;
+  };
   const handleAvatar = async (avatar: string) => {
     try {
       await firestore().collection('Users').doc(tempUser.id).update({avatar});

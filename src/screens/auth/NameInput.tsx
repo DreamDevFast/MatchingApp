@@ -21,7 +21,6 @@ const NameInput = ({navigation}: any) => {
       }),
     );
   };
-
   return (
     <Container bottom centerH>
       <IconButton
@@ -32,7 +31,7 @@ const NameInput = ({navigation}: any) => {
         onPress={() => navigation.goBack()}
       />
       <CustomText marginB-50>
-        お名前かニックネームを 入力してください
+        お名前かニックネームを 入力してください{tempUser.email}
       </CustomText>
       <TextInput
         underlineColor={Colors.white}
@@ -61,7 +60,7 @@ const styles = StyleSheet.create({
     height: 30,
     width: '70%',
     marginBottom: 50,
-    backgroundColor: Colors.back,
+    backgroundColor: 'transparent',
   },
 });
 

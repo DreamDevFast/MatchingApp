@@ -39,7 +39,7 @@ const BirthdayInput = ({navigation}: any) => {
         open={false}
         mode={'date'}
         locale={'ja'}
-        fadeToColor={Colors.back}
+        fadeToColor={Colors.gradient1}
         textColor={Colors.white}
         onDateChange={handleDate}
       />
