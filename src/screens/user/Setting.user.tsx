@@ -85,6 +85,7 @@ const UserSetting = ({navigation}: any) => {
             priceRange,
           }),
         );
+        navigation.navigate('UserDashBoard');
       } else if (setting.id === tempUser.id) {
         await firestore().collection('Settings').doc(setting.id).update({
           isNotifying,
