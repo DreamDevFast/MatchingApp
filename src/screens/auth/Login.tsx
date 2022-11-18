@@ -68,7 +68,7 @@ const Login = ({navigation}: any) => {
     <Container bottom centerH>
       <IconButton
         icon="chevron-left"
-        color={Colors.redBtn}
+        color={Colors.white}
         style={styles.backIcon}
         size={30}
         onPress={() => navigation.goBack()}
@@ -77,8 +77,8 @@ const Login = ({navigation}: any) => {
         <>
           <CustomText marginB-10>メールアドレスを入力してください</CustomText>
           <TextInput
-            underlineColor={Colors.redBtn}
-            activeUnderlineColor={Colors.redBtn}
+            underlineColor={Colors.white}
+            activeUnderlineColor={Colors.white}
             style={{...styles.emailInput}}
             theme={{colors: {text: Colors.white}}}
             value={email}
@@ -98,15 +98,15 @@ const Login = ({navigation}: any) => {
           <CustomText marginB-10>電話番号を入力してください</CustomText>
           <View row>
             <TextInput
-              underlineColor={Colors.redBtn}
-              activeUnderlineColor={Colors.redBtn}
+              underlineColor={Colors.white}
+              activeUnderlineColor={Colors.white}
               style={{...styles.phonePrefixInput}}
               theme={{colors: {text: Colors.white}}}
               value={'+81'}
             />
             <TextInput
-              underlineColor={Colors.redBtn}
-              activeUnderlineColor={Colors.redBtn}
+              underlineColor={Colors.white}
+              activeUnderlineColor={Colors.white}
               style={{...styles.phoneNumberInput}}
               theme={{colors: {text: Colors.white}}}
               value={mobile}
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     height: 30,
     width: '80%',
     marginBottom: 100,
-    backgroundColor: Colors.back,
+    backgroundColor: 'transparent',
   },
   phonePrefixInput: {
     height: 30,

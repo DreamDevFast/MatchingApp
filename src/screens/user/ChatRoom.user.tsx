@@ -28,7 +28,7 @@ const UserChatRoom = ({navigation}: any) => {
         <Appbar.Action
           icon={'chevron-left'}
           onPress={() => navigation.navigate('UserChat')}
-          color={Colors.redBtn}
+          color={Colors.white}
         />
         <Appbar.Content
           title={
@@ -42,7 +42,7 @@ const UserChatRoom = ({navigation}: any) => {
                 label={'IMG'}
               />
               <View>
-                <Text color={Colors.redBtn} style={{marginLeft: 10}}>
+                <Text color={Colors.white} style={{marginLeft: 10}}>
                   Parmela Ramirez
                 </Text>
                 <Text color={Colors.iconLabel} style={{marginLeft: 10}}>
@@ -105,13 +105,13 @@ const UserChatRoom = ({navigation}: any) => {
             <TextInput.Icon
               name="heart"
               onPress={sendMessage}
-              color={Colors.redBtn}
+              color={Colors.white}
               size={20}
               style={{paddingTop: 5}}
             />
           }
           mode={'outlined'}
-          selectionColor={Colors.redBtn}
+          selectionColor={Colors.white}
           activeOutlineColor={'transparent'}
           outlineColor={'transparent'}
           style={styles.input}

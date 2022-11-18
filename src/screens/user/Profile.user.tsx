@@ -11,25 +11,29 @@ import {Image, Text, View} from 'react-native-ui-lib';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+import {setTempUser, setLoading} from '../../redux/features/globalSlice';
+
 import {Container, CustomButton} from '../../components';
 import {Colors} from '../../styles';
 
 const {width, height} = Dimensions.get('window');
 
 const UserProfile = () => {
+  const tempUser = useAppSelector((state: any) => state.global.tempUser);
+
   return (
     <ScrollView>
       <Container>
         <ImageBackground
           source={{
-            uri:
-              'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
+            uri: tempUser.avatar,
           }}
           style={styles.image}
         />
         <View style={styles.firstBlock}>
           <Text color={Colors.white} style={styles.title}>
-            やや
+            {tempUser.name}
           </Text>
           <View row marginB-10>
             <SimpleLineIcons

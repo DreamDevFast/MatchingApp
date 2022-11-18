@@ -2,6 +2,7 @@ import React from 'react';
 import {StyleSheet, Dimensions} from 'react-native';
 import Container from './Container';
 import {IconButton, Avatar} from 'react-native-paper';
+import {View} from 'react-native-ui-lib';
 import {Colors} from '../styles';
 
 const {width, height} = Dimensions.get('window');
@@ -9,10 +10,10 @@ const {width, height} = Dimensions.get('window');
 const CustomTabnav = ({children, navigation, route, ...props}: any) => {
   return (
     <Container flex centerH>
-      <Container row spread bottom style={styles.toolBar}>
+      <View row spread bottom style={styles.toolBar}>
         <IconButton
           icon="user-alt"
-          color={Colors.white}
+          color={route.name == 'UserDashBoard' ? Colors.redBtn : Colors.white}
           size={25}
           style={
             route.name == 'UserDashBoard'
@@ -23,7 +24,7 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
         />
         <IconButton
           icon="fire"
-          color={Colors.white}
+          color={route.name == 'UserShopSearch' ? Colors.redBtn : Colors.white}
           size={25}
           style={
             route.name == 'UserShopSearch'
@@ -34,7 +35,7 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
         />
         <IconButton
           icon="comment"
-          color={Colors.white}
+          color={route.name == 'UserChat' ? Colors.redBtn : Colors.white}
           size={25}
           style={
             route.name == 'UserChat'
@@ -43,7 +44,7 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
           }
           onPress={() => navigation.navigate('UserChat')}
         />
-      </Container>
+      </View>
       {children}
     </Container>
   );
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   highLight: {
-    backgroundColor: Colors.redBtn,
+    backgroundColor: Colors.white,
   },
 });
 

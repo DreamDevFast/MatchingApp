@@ -26,7 +26,7 @@ const NameInput = ({navigation}: any) => {
     <Container bottom centerH>
       <IconButton
         icon="chevron-left"
-        color={Colors.redBtn}
+        color={Colors.white}
         style={styles.backIcon}
         size={30}
         onPress={() => navigation.goBack()}
@@ -35,8 +35,8 @@ const NameInput = ({navigation}: any) => {
         お名前かニックネームを 入力してください
       </CustomText>
       <TextInput
-        underlineColor={Colors.redBtn}
-        activeUnderlineColor={Colors.redBtn}
+        underlineColor={Colors.white}
+        activeUnderlineColor={Colors.white}
         style={{...styles.nameInput}}
         theme={{colors: {text: Colors.white}}}
         value={tempUser.name}

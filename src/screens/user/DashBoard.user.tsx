@@ -32,7 +32,6 @@ const DefaultTab = ({navigation}: any) => {
   const handleAvatar = async (avatar: string) => {
     try {
       await firestore().collection('Users').doc(tempUser.id).update({avatar});
-      console.log('updated');
       dispatch(
         setTempUser({
           ...tempUser,
@@ -102,7 +101,6 @@ const DefaultTab = ({navigation}: any) => {
       });
   };
 
-  console.log(isLoading);
   return (
     <>
       <Loader isLoading={isLoading} />
@@ -123,7 +121,7 @@ const DefaultTab = ({navigation}: any) => {
             icon="cog"
             color={Colors.back}
             style={styles.whiteIcon}
-            rippleColor={Colors.redBtn}
+            rippleColor={Colors.white}
             size={25}
             onPress={() => navigation.navigate('UserSetting')}
           />
@@ -134,7 +132,7 @@ const DefaultTab = ({navigation}: any) => {
             icon="pencil-alt"
             color={Colors.back}
             style={styles.whiteIcon}
-            rippleColor={Colors.redBtn}
+            rippleColor={Colors.white}
             size={25}
             onPress={() => navigation.navigate('UserProfile')}
           />
@@ -145,7 +143,7 @@ const DefaultTab = ({navigation}: any) => {
         <IconButton
           icon="camera"
           color={Colors.redBtn}
-          rippleColor={Colors.redBtn}
+          rippleColor={Colors.white}
           style={styles.whiteIcon}
           size={40}
           onPress={() => setOpenImagePickerModal(true)}

@@ -3,12 +3,15 @@ import {StyleSheet} from 'react-native';
 import {View, Text} from 'react-native-ui-lib';
 
 import {Colors} from '../styles';
+import Gradient from './Gradient';
 
 const Container = ({children, ...props}: any) => {
   return (
-    <View style={styles.container} {...props}>
-      {children}
-    </View>
+    <Gradient>
+      <View style={styles.container} {...props}>
+        {children}
+      </View>
+    </Gradient>
   );
 };
 
@@ -16,7 +19,6 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     resizeMode: 'contain',
-    backgroundColor: Colors.back,
   },
 });
 

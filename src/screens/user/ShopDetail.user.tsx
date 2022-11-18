@@ -127,7 +127,7 @@ const UserShopDetail = () => {
             </ScrollView>
             <Divider style={styles.divider} />
             <View centerH paddingB-100>
-              <Text color={Colors.redBtn}>REPORT</Text>
+              <Text color={Colors.white}>REPORT</Text>
             </View>
           </View>
         </Container>

@@ -11,7 +11,7 @@ const ConfirmCode = ({navigation}: any) => {
     <Container bottom centerH>
       <IconButton
         icon="chevron-left"
-        color={Colors.redBtn}
+        color={Colors.white}
         style={styles.backIcon}
         size={30}
         onPress={() => navigation.goBack()}
@@ -21,38 +21,38 @@ const ConfirmCode = ({navigation}: any) => {
       </CustomText>
       <View row>
         <TextInput
-          underlineColor={Colors.redBtn}
-          activeUnderlineColor={Colors.redBtn}
+          underlineColor={Colors.white}
+          activeUnderlineColor={Colors.white}
           style={{...styles.letter}}
           theme={{colors: {text: Colors.white}}}
         />
         <TextInput
-          underlineColor={Colors.redBtn}
-          activeUnderlineColor={Colors.redBtn}
+          underlineColor={Colors.white}
+          activeUnderlineColor={Colors.white}
           style={{...styles.letter}}
           theme={{colors: {text: Colors.white}}}
         />
         <TextInput
-          underlineColor={Colors.redBtn}
-          activeUnderlineColor={Colors.redBtn}
+          underlineColor={Colors.white}
+          activeUnderlineColor={Colors.white}
           style={{...styles.letter}}
           theme={{colors: {text: Colors.white}}}
         />
         <TextInput
-          underlineColor={Colors.redBtn}
-          activeUnderlineColor={Colors.redBtn}
+          underlineColor={Colors.white}
+          activeUnderlineColor={Colors.white}
           style={{...styles.letter}}
           theme={{colors: {text: Colors.white}}}
         />
         <TextInput
-          underlineColor={Colors.redBtn}
-          activeUnderlineColor={Colors.redBtn}
+          underlineColor={Colors.white}
+          activeUnderlineColor={Colors.white}
           style={{...styles.letter}}
           theme={{colors: {text: Colors.white}}}
         />
         <TextInput
-          underlineColor={Colors.redBtn}
-          activeUnderlineColor={Colors.redBtn}
+          underlineColor={Colors.white}
+          activeUnderlineColor={Colors.white}
           style={{...styles.letter}}
           theme={{colors: {text: Colors.white}}}
         />

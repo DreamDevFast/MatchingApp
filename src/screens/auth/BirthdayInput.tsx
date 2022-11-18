@@ -27,7 +27,7 @@ const BirthdayInput = ({navigation}: any) => {
     <Container bottom centerH>
       <IconButton
         icon="chevron-left"
-        color={Colors.redBtn}
+        color={Colors.white}
         style={styles.backIcon}
         size={30}
         onPress={() => navigation.goBack()}

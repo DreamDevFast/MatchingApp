@@ -66,7 +66,7 @@ const LocationInput = ({navigation}: any) => {
     <Container bottom centerH>
       <IconButton
         icon="chevron-left"
-        color={Colors.redBtn}
+        color={Colors.white}
         style={styles.backIcon}
         size={30}
         onPress={() => navigation.goBack()}
@@ -89,8 +89,8 @@ const LocationInput = ({navigation}: any) => {
         value={tempUser.prefecture}
       />
       <TextInput
-        underlineColor={Colors.redBtn}
-        activeUnderlineColor={Colors.redBtn}
+        underlineColor={Colors.white}
+        activeUnderlineColor={Colors.white}
         style={{...styles.address}}
         theme={{colors: {text: Colors.white}}}
         value={tempUser.address}
