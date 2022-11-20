@@ -5,14 +5,15 @@ import {View, Spacings, Avatar, Text} from 'react-native-ui-lib';
 import InfiniteScroll from 'react-native-infinite-scroll';
 import moment from 'moment';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import {Container} from '../../components';
 import {Colors} from '../../styles';
 
 const {width, height} = Dimensions.get('window');
 
-const UserChatRoom = ({navigation}: any) => {
-  const [loading, setLoading] = useState<boolean>(false);
+const UserChatRoom = ({route, navigation}: any) => {
+  const {id, name, avatar} = route.params;
+  const [message, setMessage] = useState<string>('');
 
   const sendMessage = () => {
     // TODO
@@ -22,7 +23,7 @@ const UserChatRoom = ({navigation}: any) => {
     <Container>
       {/* <Loader isLoading={loading} /> */}
       <Appbar.Header
-        style={{backgroundColor: Colors.back}}
+        style={{backgroundColor: 'transparent'}}
         statusBarHeight={20}
       >
         <Appbar.Action
@@ -32,21 +33,23 @@ const UserChatRoom = ({navigation}: any) => {
         />
         <Appbar.Content
           title={
-            <View row>
-              <Avatar
-                size={40}
-                source={{
-                  uri:
-                    'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                }}
-                label={'IMG'}
-              />
+            <View row centerV>
               <View>
-                <Text color={Colors.white} style={{marginLeft: 10}}>
-                  Parmela Ramirez
-                </Text>
-                <Text color={Colors.iconLabel} style={{marginLeft: 10}}>
-                  3 sec ago
+                <Avatar
+                  size={40}
+                  source={{
+                    uri: avatar,
+                  }}
+                  label={'IMG'}
+                  imageStyle={styles.avatar}
+                />
+              </View>
+              <View>
+                <Text
+                  color={Colors.white}
+                  style={{marginLeft: 10, fontSize: 20}}
+                >
+                  {name}
                 </Text>
               </View>
             </View>
@@ -98,27 +101,22 @@ const UserChatRoom = ({navigation}: any) => {
                     })
                 }
             </InfiniteScroll> */}
-      <View style={styles.input_box} centerH>
-        <TextInput
-          placeholder="enter message"
-          right={
-            <TextInput.Icon
-              name="heart"
-              onPress={sendMessage}
-              color={Colors.white}
-              size={20}
-              style={{paddingTop: 5}}
-            />
-          }
-          mode={'outlined'}
-          selectionColor={Colors.white}
-          activeOutlineColor={'transparent'}
-          outlineColor={'transparent'}
-          style={styles.input}
-          onKeyPress={e => {}}
-          value={''}
-          onChangeText={value => {}}
-        />
+      <View row centerV centerH style={styles.part} marginB-10 marginT-10>
+        <EvilIcons name="camera" size={40} style={styles.camera} />
+        <View row centerV centerH style={styles.subpart}>
+          <TextInput
+            mode="outlined"
+            style={styles.input}
+            selectionColor={Colors.white}
+            outlineColor={'transparent'}
+            activeOutlineColor={'transparent'}
+            theme={{colors: {text: Colors.dark}}}
+            value={message}
+            onChangeText={value => setMessage(value)}
+          />
+          <EvilIcons name="image" size={40} />
+          <EvilIcons name="sc-telegram" size={40} />
+        </View>
       </View>
     </Container>
   );
@@ -153,16 +151,33 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 35,
   },
   input: {
-    width: width * 0.9,
-    backgroundColor: Colors.white,
-    fontSize: 20,
-    height: 40,
+    height: 30,
+    backgroundColor: 'transparent',
+    width: '70%',
   },
-  input_box: {
+  part: {
+    backgroundColor: 'transparent',
+    borderRadius: 30,
     position: 'absolute',
     right: 0,
     bottom: 30,
     width,
+  },
+  subpart: {
+    width: '80%',
+    borderColor: Colors.iconLabel,
+    borderWidth: 2,
+    borderRadius: 30,
+  },
+  avatar: {
+    borderColor: Colors.white,
+    borderWidth: 2,
+  },
+  camera: {
+    // borderColor: Colors.white,
+    // borderWidth: 1,
+    // borderRadius: 30,
+    // padding: 10,
   },
 });
 
