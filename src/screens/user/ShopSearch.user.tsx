@@ -24,14 +24,22 @@ import {Colors} from '../../styles';
 
 const {width, height} = Dimensions.get('window');
 
+enum Relation {
+  initial,
+  like,
+  dislike,
+  favorite,
+}
+
 const UserShopSearch = ({navigation, route}: any) => {
   const users = firestore().collection('Users');
+  const relations = firestore().collection('Relations');
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
+
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [targetUsers, setTargetUsers] = useState<Array<any>>([]);
 
-  const [state, setState] = useState<
-    'like' | 'dislike' | 'favorite' | 'initial'
-  >('initial');
+  const [state, setState] = useState<Relation>(Relation.initial);
 
   useFocusEffect(
     useCallback(() => {
@@ -50,115 +58,155 @@ const UserShopSearch = ({navigation, route}: any) => {
     }, []),
   );
 
-  const getBackgroundColor = () => {
-    if (state === 'like') {
-      return {
-        backgroundColor: '#fe3c7280',
-      };
-    }
+  // const getBackgroundColor = () => {
+  //   if (state === 'like') {
+  //     return {
+  //       backgroundColor: '#fe3c7280',
+  //     };
+  //   }
 
-    if (state === 'dislike') {
-      return {
-        backgroundColor: '#20a39e80',
-      };
-    }
+  //   if (state === 'dislike') {
+  //     return {
+  //       backgroundColor: '#20a39e80',
+  //     };
+  //   }
 
-    return {
-      backgrounColor: '#00000000',
-    };
+  //   return {
+  //     backgrounColor: '#00000000',
+  //   };
+  // };
+
+  const handleRelation = (relation: Relation) => () => {
+    console.log(relation);
+    const targetUser = targetUsers[currentIndex];
+
+    relations
+      .where('user1', 'in', [tempUser.id, targetUser.id])
+      .get()
+      .then(querySnapshot => {
+        const results = querySnapshot.docs.filter(doc => {
+          if (
+            doc.data().user2 === tempUser.id ||
+            doc.data().user2 === targetUser.id
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+        if (results.length == 1) {
+          const doc = results[0];
+          const docId = doc.id;
+          const whichRelation =
+            tempUser.id === doc.data().user1 ? 'relation1' : 'relation2';
+          relations
+            .doc(docId)
+            .update({
+              [whichRelation]: relation,
+            })
+            .then(() => console.log('Updated'));
+        } else {
+          if (results.length > 0) {
+            console.log(
+              'Database error: more than two documents exist between two users in one direction!',
+            );
+          } else {
+            relations
+              .add({
+                user1: tempUser.id,
+                relation1: relation,
+                user2: targetUser.id,
+                relation2: Relation.initial,
+              })
+              .then(() => console.log('Added'));
+          }
+        }
+      });
+    if (currentIndex + 1 < targetUsers.length) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      setCurrentIndex(0);
+    }
   };
-
   return (
     <CustomTabnav navigation={navigation} route={route}>
       <ScrollView horizontal={true}>
-        {targetUsers.map(user => (
-          <TouchableHighlight key={user.id}>
+        {targetUsers.length > currentIndex ? (
+          <TouchableHighlight key={targetUsers[currentIndex].id}>
             <ImageBackground
               source={{
-                uri: user.avatar,
+                uri: targetUsers[currentIndex].avatar,
               }}
               style={styles.imagebackground}
               imageStyle={styles.image}
             >
               <View bottom style={styles.container}>
                 <View style={styles.desc}>
-                  <ScrollView>
-                    <Text style={styles.title}>{user.name}</Text>
-                    <View row spread>
-                      <SimpleLineIcons
-                        name="location-pin"
-                        size={20}
-                        color={Colors.redBtn}
-                      />
-                      <Text style={styles.label}>池袋</Text>
-                      <View style={{width: width * 0.2}}></View>
-                      <MaterialCommunityIcons
-                        name="piggy-bank-outline"
-                        size={20}
-                        color={Colors.redBtn}
-                      />
-                      <Text style={styles.label}>1,500円〜</Text>
-                    </View>
-                    <Divider style={styles.divider} />
-                    <Text>
-                      ようこそ！ざっぶーん！ ここは海の中のメイドカフェ＆バー
-                      ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
-                      陸のセカイでの活力になればと願い、
-                      この度新規オープンさせて頂きました★ ようこそ！ざっぶーん！
-                      ここは海の中のメイドカフェ＆バー
-                      ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
-                      陸のセカイでの活力になればと願い、
-                      この度新規オープンさせて頂きました★ ようこそ！ざっぶーん！
-                      ここは海の中のメイドカフェ＆バー
-                      ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
-                      陸のセカイでの活力になればと願い、
-                      この度新規オープンさせて頂きました★ ようこそ！ざっぶーん！
-                      ここは海の中のメイドカフェ＆バー
-                      ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
-                      陸のセカイでの活力になればと願い、
-                      この度新規オープンさせて頂きました★
-                    </Text>
-                  </ScrollView>
+                  <Text style={styles.title}>
+                    {targetUsers[currentIndex].name}
+                  </Text>
+                  <View row spread>
+                    <SimpleLineIcons
+                      name="location-pin"
+                      size={20}
+                      color={Colors.redBtn}
+                    />
+                    <Text style={styles.label}>池袋</Text>
+                    <View style={{width: width * 0.2}}></View>
+                    <MaterialCommunityIcons
+                      name="piggy-bank-outline"
+                      size={20}
+                      color={Colors.redBtn}
+                    />
+                    <Text style={styles.label}>1,500円〜</Text>
+                  </View>
+                  <Divider style={styles.divider} />
+                  <Text>
+                    ようこそ！ざっぶーん！ ここは海の中のメイドカフェ＆バー
+                    ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
+                  </Text>
                 </View>
               </View>
             </ImageBackground>
           </TouchableHighlight>
-        ))}
+        ) : (
+          <></>
+        )}
       </ScrollView>
       <IconButton
         icon="undo"
         color={Colors.white}
         style={styles.return}
         size={15}
-        onPress={() => console.log('Pressed')}
+        onPress={handleRelation(Relation.like)}
       />
       <IconButton
         icon="times"
         color={Colors.white}
         style={styles.dislike}
         size={20}
-        onPress={() => setState('dislike')}
+        onPress={handleRelation(Relation.dislike)}
       />
       <IconButton
         icon="star"
         color={Colors.white}
         style={styles.favorite}
         size={15}
-        onPress={() => console.log('Pressed')}
+        onPress={handleRelation(Relation.favorite)}
       />
       <IconButton
         icon="heart"
         color={Colors.white}
         style={styles.like}
         size={20}
-        onPress={() => setState('like')}
+        onPress={handleRelation(Relation.like)}
       />
       <IconButton
         icon="bolt"
         color={Colors.white}
         style={styles.boost}
         size={15}
-        onPress={() => console.log('Pressed')}
+        onPress={handleRelation(Relation.like)}
       />
     </CustomTabnav>
   );
@@ -171,7 +219,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width,
-    height: height * 0.6,
+    height: height * 0.5,
   },
   container: {
     height: '100%',
@@ -183,7 +231,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     padding: 30,
     paddingBottom: 0,
-    height: height * 0.5,
+    height: height * 0.55,
   },
   title: {
     height: 50,

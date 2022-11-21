@@ -1,140 +1,275 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   StyleSheet,
   ImageBackground,
   Dimensions,
   ScrollView,
   FlatList,
+  Pressable,
+  Platform,
 } from 'react-native';
-import {Appbar, Divider} from 'react-native-paper';
+import {useFocusEffect} from '@react-navigation/native';
+import {Appbar, Divider, Modal} from 'react-native-paper';
 import {Image, Text, View} from 'react-native-ui-lib';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import ImagePicker from 'react-native-image-crop-picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 import {setTempUser, setLoading} from '../../redux/features/globalSlice';
 
 import {Container, CustomButton} from '../../components';
 import {Colors} from '../../styles';
+import Portfolio from '../../components/Portfolio';
 
 const {width, height} = Dimensions.get('window');
 
+type Profile = {
+  id: string | undefined;
+  bio: string;
+  images: Array<string>;
+};
+
 const UserProfile = () => {
+  const dispatch = useAppDispatch();
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const setting = useAppSelector((state: any) => state.setting);
+
+  const profiles = firestore().collection('Profiles');
+
+  const [profile, setProfile] = useState<Profile>({
+    id: undefined,
+    bio: '',
+    images: [],
+  });
+  const [openImagePickerModal, setOpenImagePickerModal] = useState<boolean>(
+    false,
+  );
+  const [nthImage, setNthImage] = useState<number>(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      profiles
+        .doc(tempUser.id)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            const profile = doc.data();
+            if (profile !== undefined) {
+              setProfile({
+                id: doc.id,
+                bio: profile.bio,
+                images: profile.images,
+              });
+            }
+          }
+        });
+    }, []),
+  );
+
+  const handleImage = async (url: string) => {
+    if (nthImage === profile.images.length) {
+      // new image portfolio
+      if (profile.id === undefined) {
+        try {
+          await profiles.doc(tempUser.id).set({
+            bio: profile.bio,
+            images: [url],
+          });
+
+          setProfile({
+            id: tempUser.id,
+            bio: profile.bio,
+            images: [url],
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        try {
+          await profiles.doc(profile.id).update({
+            images: [...profile.images, url],
+          });
+          setProfile({
+            ...profile,
+            images: [...profile.images, url],
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    } else if (nthImage < profile.images.length) {
+      // replace image portfolio
+      try {
+        const images = [...profile.images];
+        images[nthImage] = url;
+        await profiles.doc(profile.id).update({
+          images,
+        });
+        setProfile({
+          ...profile,
+          images,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  const pickPictureOnGallery = () => {
+    ImagePicker.openPicker({
+      width: 800,
+      height: 600,
+      cropping: true,
+    })
+      .then(async image => {
+        dispatch(setLoading(true));
+        setOpenImagePickerModal(false);
+        const now = Date.now();
+
+        const filenameInStore = `${tempUser.name}-${now}.png`;
+        const reference = storage().ref(
+          `/${tempUser.name}/portfolio/${filenameInStore}`,
+        );
+        await reference.putFile(
+          Platform.OS === 'ios'
+            ? image.path.replace('file://', '')
+            : image.path,
+        );
+        const url = await reference.getDownloadURL();
+
+        await handleImage(url);
+
+        dispatch(setLoading(false));
+      })
+      .catch(err => {
+        setOpenImagePickerModal(false);
+      });
+  };
+
+  const pickPictureOnCamera = () => {
+    ImagePicker.openCamera({
+      width: 800,
+      height: 600,
+      cropping: true,
+    })
+      .then(async image => {
+        dispatch(setLoading(true));
+        setOpenImagePickerModal(false);
+        const now = Date.now();
+
+        const filenameInStore = `${tempUser.name}-${now}.png`;
+        const reference = storage().ref(
+          `/${tempUser.name}/portfolio/${filenameInStore}`,
+        );
+        await reference.putFile(
+          Platform.OS === 'ios'
+            ? image.path.replace('file://', '')
+            : image.path,
+        );
+        const url = await reference.getDownloadURL();
+        console.log('url: ', url);
+        await handleImage(url);
+
+        dispatch(setLoading(false));
+      })
+      .catch(err => {
+        setOpenImagePickerModal(false);
+      });
+  };
+
+  const handleOpenImagePickerModal = (nth: number) => () => {
+    console.log(nth);
+    setNthImage(nth);
+    setOpenImagePickerModal(true);
+  };
 
   return (
-    <ScrollView>
-      <Container>
-        <ImageBackground
-          source={{
-            uri: tempUser.avatar,
-          }}
-          style={styles.image}
-        />
-        <View style={styles.firstBlock}>
-          <Text color={Colors.white} style={styles.title}>
-            {tempUser.name}
-          </Text>
-          <View row marginB-10>
-            <SimpleLineIcons
-              name="location-pin"
-              size={20}
-              color={Colors.iconLabel}
-            />
-            <Text style={styles.label}>池袋</Text>
-          </View>
-          <View row marginB-10>
-            <MaterialCommunityIcons
-              name="piggy-bank-outline"
-              size={20}
-              color={Colors.iconLabel}
-            />
-            <Text style={styles.label}>1,500円〜</Text>
-          </View>
-          <Divider style={styles.divider} />
-          <Text color={Colors.white}>
-            可愛い衣装を着たい！時給がいいところで働きたいです！ビジュアルに自信があります！
-          </Text>
-          <Divider style={styles.divider} />
-          <ScrollView horizontal={true}>
-            <View row>
-              <View paddingH-5 style={styles.thumb}>
-                <Image
-                  source={{
-                    uri:
-                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                  }}
-                  style={styles.thumb_image}
-                />
-                <View marginB-10></View>
-                <Image
-                  source={{
-                    uri:
-                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                  }}
-                  style={styles.thumb_image}
-                />
-              </View>
-              <View paddingH-5 style={styles.thumb}>
-                <Image
-                  source={{
-                    uri:
-                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                  }}
-                  style={styles.thumb_image}
-                />
-                <View marginB-10></View>
-                <Image
-                  source={{
-                    uri:
-                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                  }}
-                  style={styles.thumb_image}
-                />
-              </View>
-              <View paddingH-5 style={styles.thumb}>
-                <Image
-                  source={{
-                    uri:
-                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                  }}
-                  style={styles.thumb_image}
-                />
-                <View marginB-10></View>
-                <Image
-                  source={{
-                    uri:
-                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                  }}
-                  style={styles.thumb_image}
-                />
-              </View>
-              <View paddingH-5 style={styles.thumb}>
-                <Image
-                  source={{
-                    uri:
-                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                  }}
-                  style={styles.thumb_image}
-                />
-                <View marginB-10></View>
-                <Image
-                  source={{
-                    uri:
-                      'https://img.freepik.com/free-photo/happy-young-asian-male-feeling-happy-smiling-looking-front-while-relaxing-kitchen-home_7861-2875.jpg?t=st=1668417813~exp=1668418413~hmac=d2dc34cdd70a3f5db1e9d74ecd35e1115213b38a833cbd7d69b4fcc97fa13c05',
-                  }}
-                  style={styles.thumb_image}
-                />
-              </View>
+    <>
+      <ScrollView>
+        <Container>
+          <ImageBackground
+            source={{
+              uri: tempUser.avatar,
+            }}
+            style={styles.image}
+          />
+          <View style={styles.firstBlock}>
+            <Text color={Colors.black} style={styles.title}>
+              {tempUser.name}
+            </Text>
+            <View row spread>
+              <SimpleLineIcons
+                name="location-pin"
+                size={20}
+                color={Colors.redBtn}
+              />
+              <Text style={styles.label}>池袋</Text>
+              <View style={{width: width * 0.2}}></View>
+              <MaterialCommunityIcons
+                name="piggy-bank-outline"
+                size={20}
+                color={Colors.redBtn}
+              />
+              <Text style={styles.label}>{setting.priceRange.low}円〜</Text>
             </View>
-          </ScrollView>
-          <Divider style={styles.divider} />
-          <View centerH paddingV-50>
-            <CustomButton label="戻る" />
+            <Divider style={styles.divider} />
+            <Text color={Colors.iconLabel}>
+              可愛い衣装を着たい！時給がいいところで働きたいです！ビジュアルに自信があります！
+            </Text>
+            <Divider style={styles.divider} />
+            <View row style={styles.portfolio_container}>
+              {profile.images.map((imageUri, key) => (
+                <Portfolio
+                  key={key}
+                  uri={imageUri}
+                  openImagePickerModal={handleOpenImagePickerModal(key)}
+                />
+              ))}
+              <Portfolio
+                openImagePickerModal={handleOpenImagePickerModal(
+                  profile.images.length,
+                )}
+              />
+            </View>
+            <Divider style={styles.divider} />
+            <View centerH paddingV-50>
+              <CustomButton color={Colors.redBtn} label="戻る" />
+            </View>
+          </View>
+        </Container>
+      </ScrollView>
+      <Modal
+        visible={openImagePickerModal}
+        dismissable
+        onDismiss={() => setOpenImagePickerModal(false)}
+        contentContainerStyle={{
+          backgroundColor: 'white',
+          padding: 20,
+          margin: 20,
+          borderRadius: 10,
+        }}
+      >
+        <View row>
+          <View flex center>
+            <Pressable onPress={pickPictureOnGallery}>
+              <Ionicons name={'ios-images'} size={40} color={Colors.grey10} />
+              <Text>Gallery</Text>
+            </Pressable>
+          </View>
+          <View flex center>
+            <Pressable onPress={pickPictureOnCamera}>
+              <Ionicons name={'md-camera'} size={40} color={Colors.grey10} />
+              <Text>Camera</Text>
+            </Pressable>
           </View>
         </View>
-      </Container>
-    </ScrollView>
+      </Modal>
+    </>
   );
 };
 
@@ -147,8 +282,12 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   firstBlock: {
-    marginHorizontal: 20,
-    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    backgroundColor: Colors.white,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: -30,
   },
   title: {
     height: 50,
@@ -168,6 +307,9 @@ const styles = StyleSheet.create({
   },
   thumb_image: {
     height: width * 0.3,
+  },
+  portfolio_container: {
+    flexWrap: 'wrap',
   },
 });
 export default UserProfile;

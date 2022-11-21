@@ -14,8 +14,17 @@ import {Colors} from '../../styles';
 
 const {width, height} = Dimensions.get('window');
 
+enum Relation {
+  initial,
+  like,
+  dislike,
+  favorite,
+}
+
 const UserChat = ({navigation, route}: any) => {
   const users = firestore().collection('Users');
+  const relations = firestore().collection('Relations');
+
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
 
   const [targetUsers, setTargetUsers] = useState<Array<any>>([]);
@@ -25,9 +34,29 @@ const UserChat = ({navigation, route}: any) => {
       users
         .where('role', '!=', tempUser.role)
         .get()
-        .then(querySnapshot => {
+        .then(async querySnapshot => {
+          let results: Array<any> = [];
+          for (let i = 0; i < querySnapshot.size; i++) {
+            const userDoc = querySnapshot.docs[i];
+            const queryResults = await relations
+              .where('user1', 'in', [userDoc.id, tempUser.id])
+              .get();
+            const result = queryResults.docs.filter(doc => {
+              return (
+                (doc.data().user2 === tempUser.id ||
+                  doc.data().user2 === userDoc.id) &&
+                doc.data().relation1 === Relation.like &&
+                doc.data().relation2 === Relation.like
+              );
+            });
+            console.log(result);
+            if (result.length === 1) {
+              results.push(userDoc);
+            }
+          }
+
           setTargetUsers(
-            querySnapshot.docs.map(doc => ({
+            results.map(doc => ({
               id: doc.id,
               name: doc.data().name,
               avatar: doc.data().avatar,

@@ -7,6 +7,7 @@ import firestore from '@react-native-firebase/firestore';
 import {Container, CustomButton, CustomText} from '../../components';
 import {Colors} from '../../styles';
 import {TextInput, Switch, IconButton} from 'react-native-paper';
+import {useFocusEffect} from '@react-navigation/native';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 import {setTempUser, setLoading} from '../../redux/features/globalSlice';
@@ -40,8 +41,33 @@ const UserSetting = ({navigation}: any) => {
     high: setting.priceRange.high,
   });
 
+  const settings = firestore().collection('Settings');
+
   const dispatch = useAppDispatch();
 
+  useFocusEffect(
+    useCallback(() => {
+      settings
+        .doc(tempUser.id)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            const setting = doc.data();
+            if (setting !== undefined) {
+              dispatch(
+                setSetting({
+                  id: doc.id,
+                  isNotifying: setting.isNotifying,
+                  searchLocation: setting.searchLocation,
+                  keyword: setting.keyword,
+                  priceRange: setting.priceRange,
+                }),
+              );
+            }
+          }
+        });
+    }, []),
+  );
   const onToggleSwitch = () => {
     SetNotifying(!isNotifying);
   };

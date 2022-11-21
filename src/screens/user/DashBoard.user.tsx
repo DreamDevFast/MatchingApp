@@ -72,13 +72,13 @@ const DefaultTab = ({navigation}: any) => {
         const now = Date.now();
 
         const filenameInStore = `${tempUser.name}-${now}.png`;
-        const reference = storage().ref(filenameInStore);
+        const reference = storage().ref(`/${tempUser.name}/${filenameInStore}`);
         await reference.putFile(
           Platform.OS === 'ios'
             ? image.path.replace('file://', '')
             : image.path,
         );
-        const url = await storage().ref(filenameInStore).getDownloadURL();
+        const url = await reference.getDownloadURL();
 
         await handleAvatar(url);
 
@@ -101,13 +101,13 @@ const DefaultTab = ({navigation}: any) => {
         const now = Date.now();
 
         const filenameInStore = `${tempUser.name}-${now}.png`;
-        const reference = storage().ref(filenameInStore);
+        const reference = storage().ref(`/${tempUser.name}/${filenameInStore}`);
         await reference.putFile(
           Platform.OS === 'ios'
             ? image.path.replace('file://', '')
             : image.path,
         );
-        const url = await storage().ref(filenameInStore).getDownloadURL();
+        const url = await reference.getDownloadURL();
 
         await handleAvatar(url);
 
