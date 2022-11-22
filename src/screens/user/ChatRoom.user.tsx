@@ -1,6 +1,7 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {Appbar, TextInput} from 'react-native-paper';
 import {StyleSheet, Dimensions, Platform} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import {View, Spacings, Avatar, Text} from 'react-native-ui-lib';
 // import InfiniteScroll from 'react-native-infinite-scroll';
 // import moment from 'moment';
@@ -25,11 +26,11 @@ import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 import {Container} from '../../components';
 import {Colors} from '../../styles';
 import CustomActions from '../../components/CustomActions';
-import {getTimeMeasureUtils} from '@reduxjs/toolkit/dist/utils';
 
 const {width, height} = Dimensions.get('window');
 
 var _isMounted = false;
+var numberOfMessages = 0;
 
 export default function UserChatRoom({route, navigation}: any) {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
@@ -41,25 +42,82 @@ export default function UserChatRoom({route, navigation}: any) {
   const {id, name, avatar} = route.params;
   const chatmessages = firestore().collection('ChatMessages');
 
-  useEffect(() => {
-    _isMounted = true;
-    setMessages([
-      {
-        _id: 3,
-        text: 'Hello developer',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
-      },
-    ]);
+  useFocusEffect(
+    useCallback(() => {
+      console.log(_isMounted);
+      const subscriber = chatmessages.onSnapshot(querySnapshot => {
+        console.log('snapshot');
+        if (querySnapshot && _isMounted) {
+          const docs = querySnapshot.docs.filter(
+            doc =>
+              (doc.data().sender === tempUser.id &&
+                doc.data().receiver === id) ||
+              (doc.data().sender === id && doc.data().receiver === tempUser.id),
+          );
+          docs.sort((a, b) => b.data().createdAt - a.data().createdAt);
+          if (docs.length) {
+            const msgs = [
+              {
+                _id: docs[0].id,
+                text: docs[0].data().text,
+                createdAt: docs[0].data().createdAt.toDate(),
+                user: {
+                  _id: docs[0].data().sender,
+                  name: docs[0].data().sender === id ? name : tempUser.name,
+                  avatar:
+                    docs[0].data().sender === id ? avatar : tempUser.avatar,
+                },
+              },
+            ];
+            setMessages((previousMessages: Array<any>) => {
+              return GiftedChat.append(previousMessages, msgs);
+            });
+            numberOfMessages++;
+          }
+        }
+      });
 
-    return () => {
-      _isMounted = false;
-    };
-  }, []);
+      chatmessages
+        .where('sender', 'in', [id, tempUser.id])
+        .get()
+        .then(querySnapshot => {
+          if (querySnapshot) {
+            let docs = querySnapshot.docs.filter(
+              doc =>
+                doc.data().receiver === id ||
+                doc.data().receiver === tempUser.id,
+            );
+            docs = docs
+              .sort((a, b) => b.data().createdAt - a.data().createdAt)
+              .slice(0, 20);
+
+            numberOfMessages = docs.length;
+
+            if (numberOfMessages) {
+              const msgs = docs.map(doc => ({
+                _id: doc.id,
+                text: doc.data().text,
+                createdAt: doc.data().createdAt.toDate(),
+                user: {
+                  _id: doc.data().sender,
+                  name: doc.data().sender === id ? name : tempUser.name,
+                  avatar: doc.data().sender === id ? avatar : tempUser.avatar,
+                },
+              }));
+              setMessages((previousMessages: Array<any>) => {
+                return GiftedChat.append(previousMessages, msgs);
+              });
+            }
+          }
+        });
+
+      return () => {
+        subscriber();
+        _isMounted = false;
+        numberOfMessages = 0;
+      };
+    }, []),
+  );
 
   const renderSend = (props: SendProps<IMessage>) => (
     <Send {...props} label={'dddd'} containerStyle={styles.send}>
@@ -78,43 +136,64 @@ export default function UserChatRoom({route, navigation}: any) {
       />
     );
   };
-  // const renderCustomActions = props =>
-  //     <CustomActions {...props} onSend={() => {}} />
-  //   )
 
   const onSend = useCallback((messages: Array<any> = []) => {
-    setMessages((previousMessages: Array<any>) => {
-      const msgs = GiftedChat.append(previousMessages, messages);
-      return msgs;
+    chatmessages.add({
+      sender: tempUser.id,
+      text: messages[0].text,
+      createdAt: new Date(),
+      receiver: id,
     });
   }, []);
 
   const onLoadEarlier = () => {
-    console.log('load earlier');
+    console.log('load earlier', _isMounted);
+    if (!_isMounted) {
+      _isMounted = true;
+      return;
+    }
     setIsLoadingEarlier(true);
 
-    setTimeout(() => {
-      console.log(_isMounted);
-      if (_isMounted === true) {
-        setMessages((previousMessages: Array<any>) => {
-          const msgs = GiftedChat.prepend(previousMessages, [
-            {
-              _id: 22,
-              text: 'Hello developer',
-              createdAt: new Date(),
-              user: {
-                _id: 2,
-                name: 'React Native',
-                avatar: 'https://placeimg.com/140/140/any',
-              },
-            },
-          ] as IMessage[]);
-          return msgs;
+    if (_isMounted === true) {
+      chatmessages
+        .where('sender', 'in', [id, tempUser.id])
+        .get()
+        .then(querySnapshot => {
+          if (querySnapshot) {
+            let docs = querySnapshot.docs.filter(
+              doc =>
+                doc.data().receiver === id ||
+                doc.data().receiver === tempUser.id,
+            );
+            docs = docs
+              .sort((a, b) => b.data().createdAt - a.data().createdAt)
+              .slice(numberOfMessages, numberOfMessages + 20);
+
+            const newLen = docs.length;
+            if (newLen) {
+              setMessages((previousMessages: Array<any>) => {
+                const msgs = GiftedChat.prepend(
+                  previousMessages,
+                  docs.map(doc => ({
+                    _id: doc.id,
+                    text: doc.data().text,
+                    createdAt: doc.data().createdAt.toDate(),
+                    user: {
+                      _id: doc.data().sender,
+                      name: doc.data().sender === id ? name : tempUser.name,
+                      avatar:
+                        doc.data().sender === id ? avatar : tempUser.avatar,
+                    },
+                  })) as IMessage[],
+                );
+                return msgs;
+              });
+              numberOfMessages += newLen;
+            }
+            setIsLoadingEarlier(false);
+          }
         });
-        setIsLoadingEarlier(false);
-        console.log('finished');
-      }
-    }, 1500); // simulating network
+    }
   };
 
   return (
