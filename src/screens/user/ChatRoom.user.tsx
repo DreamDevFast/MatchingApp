@@ -1,27 +1,124 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {Appbar, TextInput} from 'react-native-paper';
-import {StyleSheet, Dimensions} from 'react-native';
+import {StyleSheet, Dimensions, Platform} from 'react-native';
 import {View, Spacings, Avatar, Text} from 'react-native-ui-lib';
-import InfiniteScroll from 'react-native-infinite-scroll';
-import moment from 'moment';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+// import InfiniteScroll from 'react-native-infinite-scroll';
+// import moment from 'moment';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
+
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {
+  GiftedChat,
+  IMessage,
+  SendProps,
+  Send,
+  InputToolbar,
+  InputToolbarProps,
+  ActionsProps,
+} from 'react-native-gifted-chat';
+
+import firestore from '@react-native-firebase/firestore';
+
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+
 import {Container} from '../../components';
 import {Colors} from '../../styles';
+import CustomActions from '../../components/CustomActions';
+import {getTimeMeasureUtils} from '@reduxjs/toolkit/dist/utils';
 
 const {width, height} = Dimensions.get('window');
 
-const UserChatRoom = ({route, navigation}: any) => {
-  const {id, name, avatar} = route.params;
-  const [message, setMessage] = useState<string>('');
+var _isMounted = false;
 
-  const sendMessage = () => {
-    // TODO
-    console.log('send message');
+export default function UserChatRoom({route, navigation}: any) {
+  const tempUser = useAppSelector((state: any) => state.global.tempUser);
+
+  const [messages, setMessages] = useState<any>([]);
+  const [isLoadingEarlier, setIsLoadingEarlier] = useState<boolean>(false);
+  const [loadEarlier, setEarlier] = useState<boolean>(true);
+
+  const {id, name, avatar} = route.params;
+  const chatmessages = firestore().collection('ChatMessages');
+
+  useEffect(() => {
+    _isMounted = true;
+    setMessages([
+      {
+        _id: 3,
+        text: 'Hello developer',
+        createdAt: new Date(),
+        user: {
+          _id: 2,
+          name: 'React Native',
+          avatar: 'https://placeimg.com/140/140/any',
+        },
+      },
+    ]);
+
+    return () => {
+      _isMounted = false;
+    };
+  }, []);
+
+  const renderSend = (props: SendProps<IMessage>) => (
+    <Send {...props} label={'dddd'} containerStyle={styles.send}>
+      <EvilIcons size={30} color={Colors.iconLabel} name={'sc-telegram'} />
+    </Send>
+  );
+  const renderInputToolbar = (props: InputToolbarProps<IMessage>) => {
+    return (
+      <InputToolbar
+        {...props}
+        containerStyle={styles.inputtoolbar_container}
+        primaryStyle={styles.inputtoolbar_primary}
+        renderActions={(props: ActionsProps) => {
+          return <CustomActions {...props} />;
+        }}
+      />
+    );
   };
+  // const renderCustomActions = props =>
+  //     <CustomActions {...props} onSend={() => {}} />
+  //   )
+
+  const onSend = useCallback((messages: Array<any> = []) => {
+    setMessages((previousMessages: Array<any>) => {
+      const msgs = GiftedChat.append(previousMessages, messages);
+      return msgs;
+    });
+  }, []);
+
+  const onLoadEarlier = () => {
+    console.log('load earlier');
+    setIsLoadingEarlier(true);
+
+    setTimeout(() => {
+      console.log(_isMounted);
+      if (_isMounted === true) {
+        setMessages((previousMessages: Array<any>) => {
+          const msgs = GiftedChat.prepend(previousMessages, [
+            {
+              _id: 22,
+              text: 'Hello developer',
+              createdAt: new Date(),
+              user: {
+                _id: 2,
+                name: 'React Native',
+                avatar: 'https://placeimg.com/140/140/any',
+              },
+            },
+          ] as IMessage[]);
+          return msgs;
+        });
+        setIsLoadingEarlier(false);
+        console.log('finished');
+      }
+    }, 1500); // simulating network
+  };
+
   return (
     <Container>
-      {/* <Loader isLoading={loading} /> */}
       <Appbar.Header
         style={{backgroundColor: 'transparent'}}
         statusBarHeight={20}
@@ -57,128 +154,57 @@ const UserChatRoom = ({route, navigation}: any) => {
           color={Colors.white}
         />
       </Appbar.Header>
-      {/* <InfiniteScroll
-                horizontal={false}
-                onLoadMoreAsync={getMessage}
-                distanceFromEnd={10}
-                style={{ transform: [{ scaleY: -1 }] }}
-            >
-                {
-                    !(typeof messages !== 'undefined' && messages.length > 0) && (
-                        <View center style={{ height: '100%', transform: [{ scaleY: -1 }], marginBottom: height/1.8 }}>
-                            <MaterialCommunityIcons name={'message-text-clock-outline'} size={80} color={Colors.grey30}/>
-                            <Text center margin-s1 text70> {t['title']['no_data']} </Text>
-                        </View>
-                    )
-                }
-                {
-                    messages.sort((a,b) => b.id-a.id).map((message, index) => {
-                        return message.sender_id === user.id ? (
-                            <View key={index} flex right style={{ transform: [{ scaleY: -1 }] }}>
-                                <View style={styles.sendMessage}>
-                                    <Text color={Colors.white}>
-                                        {message.message}
-                                    </Text>
-                                    <View row marginT-s3>
-                                        <Ionicons name={message.read ? 'ios-checkmark-done-sharp' : 'time'} size={18} color={Colors.white} />
-                                        <Text marginL-s2 color={Colors.white}>{moment(message.created_at).format('YYYY-MM-DD kk:mm:ss')}</Text>
-                                    </View>
-                                </View>
-                            </View>
-                        ) : (
-                            <View key={index} flex left style={{ transform: [{ scaleY: -1 }] }}>
-                                <View style={styles.receiveMessage}>
-                                    <Text>
-                                        {message.message}
-                                    </Text>
-                                    <View row marginT-s3>
-                                        <Ionicons name={message.read ? 'ios-checkmark-done-sharp' : 'time'} size={18} color={Colors.cyan30} />
-                                        <Text marginL-s2>{moment(message.created_at).format('YYYY-MM-DD kk:mm:ss')}</Text>
-                                    </View>
-                                </View>
-                            </View>
-                        )
-                    })
-                }
-            </InfiniteScroll> */}
-      <View row centerV centerH style={styles.part} marginB-10 marginT-10>
-        <EvilIcons name="camera" size={40} style={styles.camera} />
-        <View row centerV centerH style={styles.subpart}>
-          <TextInput
-            mode="outlined"
-            style={styles.input}
-            selectionColor={Colors.white}
-            outlineColor={'transparent'}
-            activeOutlineColor={'transparent'}
-            theme={{colors: {text: Colors.dark}}}
-            value={message}
-            onChangeText={value => setMessage(value)}
-          />
-          <EvilIcons name="image" size={40} />
-          <EvilIcons name="sc-telegram" size={40} />
-        </View>
+      <View style={styles.container}>
+        <GiftedChat
+          alwaysShowSend={true}
+          messages={messages}
+          loadEarlier={loadEarlier}
+          isLoadingEarlier={isLoadingEarlier}
+          renderSend={renderSend}
+          onSend={messages => onSend(messages)}
+          onLoadEarlier={onLoadEarlier}
+          renderInputToolbar={renderInputToolbar}
+          user={{
+            _id: tempUser.id,
+          }}
+          infiniteScroll
+        />
       </View>
     </Container>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
-    resizeMode: 'contain',
     backgroundColor: Colors.white,
+    flex: 1,
   },
-  sendMessage: {
-    margin: Spacings.s2,
-    padding: Spacings.s5,
-    paddingVertical: Spacings.s2,
-    width: width * 0.6,
-    backgroundColor: Colors.cyan20,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 50,
-    borderTopLeftRadius: 35,
-    borderTopRightRadius: 0,
+  send: {
+    justifyContent: 'center',
   },
-  receiveMessage: {
-    margin: Spacings.s2,
-    paddingLeft: 30,
-    paddingVertical: Spacings.s2,
-    width: width * 0.6,
-    backgroundColor: Colors.grey60,
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 35,
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 35,
+  sendbox: {
+    borderRadius: 20,
+    borderColor: '#ff0000',
   },
-  input: {
-    height: 30,
-    backgroundColor: 'transparent',
-    width: '70%',
+  inputtoolbar_container: {
+    // borderColor: '#ff0000',
+    borderTopColor: 'transparent',
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    // borderWidth: 1,
+    paddingVertical: 5,
+    // width: width * 0.8,
+    // borderRadius: 10,
   },
-  part: {
-    backgroundColor: 'transparent',
-    borderRadius: 30,
-    position: 'absolute',
-    right: 0,
-    bottom: 30,
-    width,
-  },
-  subpart: {
-    width: '80%',
+  inputtoolbar_primary: {
     borderColor: Colors.iconLabel,
-    borderWidth: 2,
-    borderRadius: 30,
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    width: width * 0.8,
+    borderRadius: 10,
   },
   avatar: {
     borderColor: Colors.white,
     borderWidth: 2,
   },
-  camera: {
-    // borderColor: Colors.white,
-    // borderWidth: 1,
-    // borderRadius: 30,
-    // padding: 10,
-  },
 });
-
-export default UserChatRoom;
