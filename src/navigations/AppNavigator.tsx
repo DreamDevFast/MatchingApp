@@ -37,7 +37,7 @@ const AppNavigator = () => {
           name="PhoneVerificationSample"
           component={PhoneVerification}
         /> */}
-        <Stack.Screen name="AnimationTest" component={AnimationTest} />
+        {/* <Stack.Screen name="AnimationTest" component={AnimationTest} /> */}
         <Stack.Screen name="Home" component={FirstScreen} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
