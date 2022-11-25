@@ -25,7 +25,10 @@ import CustomTabnav from '../../components/CustomTabnav';
 import {Colors} from '../../styles';
 import CustomStamp from '../../components/CustomStamp';
 
+const defaultImage = require('../../assets/images/empty.jpg');
+
 const {width, height} = Dimensions.get('window');
+const threshold = width * 0.1;
 
 enum Relation {
   initial,
@@ -46,16 +49,23 @@ const UserShopSearch = ({navigation, route}: any) => {
 
   const [state, setState] = useState<Relation>(Relation.initial);
   const pan = useRef(new Animated.ValueXY()).current;
-  const [direction, setDirection] = useState<1 | -1>(1);
-  const [isFavoritePossible, setIsFavoritePossible] = useState<1 | 0>(1);
+  const favoriteValue = Animated.multiply(
+    pan.x.interpolate({
+      inputRange: [
+        -width,
+        -threshold,
+        -(threshold - 1),
+        0,
+        threshold - 1,
+        threshold,
+        width,
+      ],
+      outputRange: [0, 0, 1, 1, 1, 0, 0],
+    }),
+    pan.y,
+  );
 
-  // pan.addListener(value => {
-  //   if (Math.abs(value.x) > width * 0.1) {
-  //     setIsFavoritePossible(0);
-  //   } else {
-  //     setIsFavoritePossible(1);
-  //   }
-  // });
+  const [direction, setDirection] = useState<1 | -1>(1);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -71,8 +81,11 @@ const UserShopSearch = ({navigation, route}: any) => {
         useNativeDriver: false,
       }),
       onPanResponderRelease: (e, gestureState) => {
-        console.log(gestureState.dx);
-        if (Math.abs(gestureState.dx) < width * 0.3) {
+        console.log(gestureState.dx, width * 0.3);
+        if (
+          Math.abs(gestureState.dx) < width * 0.3 &&
+          gestureState.dy > width * -0.3
+        ) {
           Animated.spring(pan, {
             toValue: {
               x: 0,
@@ -103,6 +116,11 @@ const UserShopSearch = ({navigation, route}: any) => {
           useNativeDriver: false,
           duration: 0,
         }).start();
+        if (gestureState.dx >= width * 0.3) handleRelation(Relation.like)();
+        else if (gestureState.dx <= width * -0.3) {
+          handleRelation(Relation.dislike)();
+        } else if (gestureState.dy <= width * -0.3)
+          handleRelation(Relation.favorite)();
         setCurrentIndex(index);
       },
     }),
@@ -148,8 +166,9 @@ const UserShopSearch = ({navigation, route}: any) => {
   // };
 
   const handleRelation = (relation: Relation) => () => {
-    console.log(relation);
+    console.log('relation: ', relation);
     const targetUser = targetUsers[currentIndex];
+    console.log(tempUser, targetUser);
 
     relations
       .where('user1', 'in', [tempUser.id, targetUser.id])
@@ -199,6 +218,7 @@ const UserShopSearch = ({navigation, route}: any) => {
       setCurrentIndex(0);
     }
   };
+  console.log('d');
   return (
     <CustomTabnav navigation={navigation} route={route}>
       {targetUsers
@@ -220,7 +240,7 @@ const UserShopSearch = ({navigation, route}: any) => {
                     },
                     {
                       rotateZ: pan.x.interpolate({
-                        inputRange: [-200, 0, 200],
+                        inputRange: [-width, 0, width],
                         outputRange:
                           direction === 1
                             ? ['-10deg', '0deg', '10deg']
@@ -232,9 +252,13 @@ const UserShopSearch = ({navigation, route}: any) => {
                 {...panResponder.panHandlers}
               >
                 <ImageBackground
-                  source={{
-                    uri: user.avatar,
-                  }}
+                  source={
+                    user.avatar === 'default.png'
+                      ? defaultImage
+                      : {
+                          uri: user.avatar,
+                        }
+                  }
                   style={styles.imagebackground}
                   imageStyle={styles.image}
                 >
@@ -265,9 +289,9 @@ const UserShopSearch = ({navigation, route}: any) => {
                     text={'favorite'}
                     style={{
                       ...styles.favorite_stamp,
-                      opacity: pan.y.interpolate({
+                      opacity: favoriteValue.interpolate({
                         inputRange: [-200, 0, 200],
-                        outputRange: [3, 0, 3],
+                        outputRange: [3, 0, 0],
                       }),
                     }}
                     text_style={styles.favorite_text}
@@ -325,9 +349,13 @@ const UserShopSearch = ({navigation, route}: any) => {
                 {...panResponder.panHandlers}
               >
                 <ImageBackground
-                  source={{
-                    uri: user.avatar,
-                  }}
+                  source={
+                    user.avatar === 'default.png'
+                      ? defaultImage
+                      : {
+                          uri: user.avatar,
+                        }
+                  }
                   style={styles.imagebackground}
                   imageStyle={styles.image}
                 >

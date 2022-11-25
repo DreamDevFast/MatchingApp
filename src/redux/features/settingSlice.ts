@@ -2,7 +2,7 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 import type {AppState} from '../store';
 
-export type PriceRange = {
+export type Range = {
   low: number;
   high: number;
 };
@@ -12,7 +12,9 @@ export interface SettingState {
   isNotifying: boolean;
   searchLocation: string;
   keyword: string;
-  priceRange: PriceRange;
+  priceRange: Range;
+  unlimitedLikesAndChat: string;
+  ageRange: Range;
 }
 
 const initialState: SettingState = {
@@ -24,6 +26,11 @@ const initialState: SettingState = {
     low: 1500,
     high: 10000,
   },
+  unlimitedLikesAndChat: '0',
+  ageRange: {
+    low: 15,
+    high: 30,
+  },
 };
 
 type setNotifyingPayload = boolean;
@@ -32,7 +39,7 @@ type setSearchLocationPayload = string;
 
 type setKeywordPayload = string;
 
-type setPriceRange = PriceRange;
+type setPriceRange = Range;
 
 export const settingSlice = createSlice({
   name: 'setting',
@@ -45,12 +52,16 @@ export const settingSlice = createSlice({
         searchLocation,
         keyword,
         priceRange,
+        unlimitedLikesAndChat,
+        ageRange,
       } = action.payload;
       state.id = id;
       state.isNotifying = isNotifying;
       state.searchLocation = searchLocation;
       state.keyword = keyword;
       state.priceRange = priceRange;
+      state.unlimitedLikesAndChat = unlimitedLikesAndChat;
+      state.ageRange = ageRange;
     },
     setNotifying: (state, action: PayloadAction<setNotifyingPayload>) => {
       state.isNotifying = action.payload;

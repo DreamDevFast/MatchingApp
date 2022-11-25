@@ -13,7 +13,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 import {setTempUser, setLoading} from '../../redux/features/globalSlice';
 import {
   setSetting,
-  PriceRange,
+  Range,
   setPriceRange,
 } from '../../redux/features/settingSlice';
 
@@ -36,15 +36,23 @@ const UserSetting = ({navigation}: any) => {
     setting.searchLocation,
   );
   const [keyword, SetKeyword] = useState<string>(setting.keyword);
-  const [priceRange, SetPriceRange] = useState<PriceRange>({
+  const [priceRange, SetPriceRange] = useState<Range>({
     low: setting.priceRange.low,
     high: setting.priceRange.high,
+  });
+  const [unlimitedLikesAndChat, SetUnlimited] = useState<string>(
+    setting.unlimitedLikesAndChat,
+  );
+  const [ageRange, SetAgeRange] = useState<Range>({
+    low: setting.ageRange.low,
+    high: setting.ageRange.high,
   });
 
   const settings = firestore().collection('Settings');
 
   const dispatch = useAppDispatch();
 
+  console.log('refresh', setting.isNotifying, isNotifying);
   useFocusEffect(
     useCallback(() => {
       settings
@@ -53,21 +61,45 @@ const UserSetting = ({navigation}: any) => {
         .then(doc => {
           if (doc.exists) {
             const setting = doc.data();
+            console.log('doc', setting);
             if (setting !== undefined) {
               dispatch(
                 setSetting({
                   id: doc.id,
                   isNotifying: setting.isNotifying,
                   searchLocation: setting.searchLocation,
-                  keyword: setting.keyword,
+                  keyword: setting.keyword === undefined ? '' : setting.keyword,
                   priceRange: setting.priceRange,
+                  unlimitedLikesAndChat:
+                    setting.unlimitedLikesAndChat === undefined
+                      ? '0'
+                      : setting.unlimitedLikesAndChat,
+                  ageRange:
+                    setting.ageRange === undefined
+                      ? {low: 15, high: 30}
+                      : setting.ageRange,
                 }),
+              );
+              SetNotifying(setting.isNotifying);
+              SetSearchLocation(setting.searchLocation);
+              SetKeyword(setting.keyword === undefined ? '' : setting.keyword);
+              SetPriceRange(setting.priceRange);
+              SetUnlimited(
+                setting.unlimitedLikesAndChat === undefined
+                  ? '0'
+                  : setting.unlimitedLikesAndChat,
+              );
+              SetAgeRange(
+                setting.ageRange === undefined
+                  ? {low: 15, high: 30}
+                  : setting.ageRange,
               );
             }
           }
         });
     }, []),
   );
+
   const onToggleSwitch = () => {
     SetNotifying(!isNotifying);
   };
@@ -80,8 +112,13 @@ const UserSetting = ({navigation}: any) => {
     [],
   );
   const renderNotch = useCallback(() => <Notch />, []);
-  const handleValueChange = useCallback((low: number, high: number) => {
+  const handlePriceValueChange = useCallback((low: number, high: number) => {
     SetPriceRange({low, high});
+  }, []);
+
+  const handleAgeValueChange = useCallback((low: number, high: number) => {
+    console.log(low, high);
+    SetAgeRange({low, high});
   }, []);
 
   const saveAndReturn = async () => {
@@ -104,6 +141,8 @@ const UserSetting = ({navigation}: any) => {
           keyword,
           searchLocation,
           priceRange,
+          unlimitedLikesAndChat,
+          ageRange,
         });
         console.log('save setting info succeeded!');
         dispatch(
@@ -113,6 +152,8 @@ const UserSetting = ({navigation}: any) => {
             searchLocation,
             keyword,
             priceRange,
+            unlimitedLikesAndChat,
+            ageRange,
           }),
         );
         dispatch(setLoading(false));
@@ -124,8 +165,10 @@ const UserSetting = ({navigation}: any) => {
           keyword,
           searchLocation,
           priceRange,
+          unlimitedLikesAndChat,
+          ageRange,
         });
-        console.log('update setting info succeeded!');
+        console.log('update setting info succeeded!', ageRange);
         dispatch(
           setSetting({
             id: tempUser.id,
@@ -133,6 +176,8 @@ const UserSetting = ({navigation}: any) => {
             searchLocation,
             keyword,
             priceRange,
+            unlimitedLikesAndChat,
+            ageRange,
           }),
         );
         dispatch(setLoading(false));
@@ -159,11 +204,15 @@ const UserSetting = ({navigation}: any) => {
   );
 
   const handleSettingValue = useCallback(
-    (key: 'searchLocation' | 'keyword') => (value: string) => {
+    (key: 'searchLocation' | 'keyword' | 'unlimitedLikesAndChat') => (
+      value: string,
+    ) => {
       if (key === 'searchLocation') {
         SetSearchLocation(value);
       } else if (key === 'keyword') {
         SetKeyword(value);
+      } else if (key === 'unlimitedLikesAndChat') {
+        SetUnlimited(value);
       }
     },
     [],
@@ -184,7 +233,27 @@ const UserSetting = ({navigation}: any) => {
           <View style={styles.block} centerH marginT-27>
             <Text style={styles.title}>設定</Text>
           </View>
-          <View style={styles.block} marginT-20>
+          <View marginT-20></View>
+          {tempUser.role === 'shop' ? (
+            <View style={styles.block}>
+              <Text color={Colors.subLabel}>無制限のいいねとチャット</Text>
+              <View centerV right style={styles.part} marginB-10 marginT-10>
+                <TextInput
+                  style={styles.input}
+                  selectionColor={Colors.black}
+                  underlineColor={'#ffffff'}
+                  activeUnderlineColor={'#ffffff'}
+                  theme={{colors: {text: Colors.dark}}}
+                  value={unlimitedLikesAndChat}
+                  onChangeText={handleSettingValue('unlimitedLikesAndChat')}
+                />
+              </View>
+            </View>
+          ) : (
+            <></>
+          )}
+
+          <View style={styles.block}>
             <Text color={Colors.subLabel}>アカウント設定</Text>
             <View row spread centerV style={styles.part} marginB-10 marginT-10>
               <Text style={styles.partLabel}>メールアドレス</Text>
@@ -222,18 +291,23 @@ const UserSetting = ({navigation}: any) => {
           </View>
           <View style={styles.block} marginT-10>
             <Text color={Colors.subLabel}>検索条件</Text>
-            <View row spread centerV style={styles.part} marginB-10 marginT-10>
-              <Text style={styles.partLabel}>希望エリア</Text>
-              <TextInput
-                style={styles.input}
-                selectionColor={Colors.black}
-                underlineColor={'#ffffff'}
-                activeUnderlineColor={'#ffffff'}
-                theme={{colors: {text: Colors.dark}}}
-                value={searchLocation}
-                onChangeText={handleSettingValue('searchLocation')}
-              />
-            </View>
+            <View marginT-10></View>
+            {tempUser.role === 'girl' ? (
+              <View row spread centerV style={styles.part} marginB-10>
+                <Text style={styles.partLabel}>希望エリア</Text>
+                <TextInput
+                  style={styles.input}
+                  selectionColor={Colors.black}
+                  underlineColor={'#ffffff'}
+                  activeUnderlineColor={'#ffffff'}
+                  theme={{colors: {text: Colors.dark}}}
+                  value={searchLocation}
+                  onChangeText={handleSettingValue('searchLocation')}
+                />
+              </View>
+            ) : (
+              <></>
+            )}
             <View style={{...styles.part, height: 70}} centerV marginB-10>
               <View row spread centerV marginT-10>
                 <Text style={styles.partLabel}>希望時給</Text>
@@ -252,22 +326,53 @@ const UserSetting = ({navigation}: any) => {
                   renderRailSelected={renderRailSelected}
                   renderLabel={renderLabel}
                   renderNotch={renderNotch}
-                  onValueChanged={handleValueChange}
+                  onValueChanged={handlePriceValueChange}
                 />
               </View>
             </View>
-            <View row spread centerV style={styles.part} marginB-10>
-              <Text style={styles.partLabel}>キーワード</Text>
-              <TextInput
-                style={styles.input}
-                selectionColor={Colors.black}
-                underlineColor={'#ffffff'}
-                activeUnderlineColor={'#ffffff'}
-                theme={{colors: {text: Colors.dark}}}
-                value={keyword}
-                onChangeText={handleSettingValue('keyword')}
-              />
-            </View>
+            {tempUser.role === 'shop' ? (
+              <View style={{...styles.part, height: 70}} centerV marginB-10>
+                <View row spread centerV marginT-10>
+                  <Text style={styles.partLabel}>年齢</Text>
+                </View>
+                <View marginT-20 marginB-20 centerH>
+                  <RangeSlider
+                    style={styles.slider}
+                    min={15}
+                    max={30}
+                    low={ageRange.low}
+                    high={ageRange.high}
+                    step={1}
+                    floatingLabel
+                    renderThumb={renderThumb}
+                    renderRail={renderRail}
+                    renderRailSelected={renderRailSelected}
+                    renderLabel={renderLabel}
+                    renderNotch={renderNotch}
+                    onValueChanged={handleAgeValueChange}
+                  />
+                </View>
+              </View>
+            ) : (
+              <></>
+            )}
+
+            {tempUser.role === 'girl' ? (
+              <View row spread centerV style={styles.part} marginB-10>
+                <Text style={styles.partLabel}>キーワード</Text>
+                <TextInput
+                  style={styles.input}
+                  selectionColor={Colors.black}
+                  underlineColor={'#ffffff'}
+                  activeUnderlineColor={'#ffffff'}
+                  theme={{colors: {text: Colors.dark}}}
+                  value={keyword}
+                  onChangeText={handleSettingValue('keyword')}
+                />
+              </View>
+            ) : (
+              <></>
+            )}
           </View>
           <View style={styles.block} marginT-10>
             <Text color={Colors.subLabel}>お問い合わせ</Text>
