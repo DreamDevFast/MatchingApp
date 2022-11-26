@@ -24,6 +24,7 @@ import {setTempUser, setLoading} from '../../redux/features/globalSlice';
 import CustomTabnav from '../../components/CustomTabnav';
 import {Colors} from '../../styles';
 import CustomStamp from '../../components/CustomStamp';
+import Loader from '../../components/Loader';
 
 const defaultImage = require('../../assets/images/empty.jpg');
 
@@ -40,9 +41,12 @@ enum Relation {
 var index = 0;
 
 const UserShopSearch = ({navigation, route}: any) => {
+  const dispatch = useAppDispatch();
+
   const users = firestore().collection('Users');
   const relations = firestore().collection('Relations');
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const isLoading = useAppSelector((state: any) => state.global.isLoading);
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [targetUsers, setTargetUsers] = useState<Array<any>>([]);
@@ -147,23 +151,60 @@ const UserShopSearch = ({navigation, route}: any) => {
     }, []),
   );
 
-  // const getBackgroundColor = () => {
-  //   if (state === 'like') {
-  //     return {
-  //       backgroundColor: '#fe3c7280',
-  //     };
-  //   }
+  const handleFilter = async (filterName: Relation) => {
+    dispatch(setLoading(true));
 
-  //   if (state === 'dislike') {
-  //     return {
-  //       backgroundColor: '#20a39e80',
-  //     };
-  //   }
+    const querySnapshot = await users.where('role', '!=', tempUser.role).get();
+    console.log('out', querySnapshot.size);
+    if (querySnapshot.size) {
+      console.log('in', querySnapshot.size);
+      const users = querySnapshot.docs;
+      console.log(tempUser.id, filterName);
+      const relationQuerySnapshot1 = await relations
+        .where('user1', '==', tempUser.id)
+        .where('relation1', '==', filterName)
+        .get();
+      const relationQuerySnapshot2 = await relations
+        .where('user2', '==', tempUser.id)
+        .where('relation2', '==', filterName)
+        .get();
 
-  //   return {
-  //     backgrounColor: '#00000000',
-  //   };
-  // };
+      let resultUsers = [];
+      console.log('relation1 size: ', relationQuerySnapshot1.size);
+      console.log('relation2 size: ', relationQuerySnapshot2.size);
+      for (let i = 0; i < relationQuerySnapshot1.size; i++) {
+        let index = users.findIndex(
+          user => user.id === relationQuerySnapshot1.docs[i].data().user2,
+        );
+
+        if (index > -1) {
+          resultUsers.push({
+            id: users[i].id,
+            name: users[i].data().name,
+            avatar: users[i].data().avatar,
+          });
+        }
+      }
+
+      for (let i = 0; i < relationQuerySnapshot2.size; i++) {
+        let index = users.findIndex(
+          user => user.id === relationQuerySnapshot2.docs[i].data().user1,
+        );
+
+        if (index > -1) {
+          resultUsers.push({
+            id: users[i].id,
+            name: users[i].data().name,
+            avatar: users[i].data().avatar,
+          });
+        }
+      }
+
+      setTargetUsers(resultUsers);
+    }
+
+    dispatch(setLoading(false));
+  };
 
   const handleRelation = (relation: Relation) => () => {
     console.log('relation: ', relation);
@@ -220,7 +261,12 @@ const UserShopSearch = ({navigation, route}: any) => {
   };
   console.log('d');
   return (
-    <CustomTabnav navigation={navigation} route={route}>
+    <CustomTabnav
+      navigation={navigation}
+      route={route}
+      handleFilter={handleFilter}
+    >
+      <Loader isLoading={isLoading} />
       {targetUsers
         .slice(currentIndex, currentIndex + 2)
         .reverse()
