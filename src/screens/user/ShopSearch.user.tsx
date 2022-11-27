@@ -147,14 +147,40 @@ const UserShopSearch = ({navigation, route}: any) => {
       users
         .where('role', '!=', tempUser.role)
         .get()
-        .then(querySnapshot => {
-          setTargetUsers(
-            querySnapshot.docs.map(doc => ({
-              id: doc.id,
-              name: doc.data().name,
-              avatar: doc.data().avatar,
-            })),
+        .then(async querySnapshot => {
+          const users = await Promise.all(
+            querySnapshot.docs.map(async doc => {
+              const profile = await profiles.doc(doc.id).get();
+              const setting = await settings.doc(doc.id).get();
+
+              let bio = '',
+                priceRange = {low: 1500, high: 10000};
+
+              if (profile.exists) {
+                let data = profile.data();
+                if (data !== undefined) {
+                  bio = data.bio;
+                }
+              }
+
+              if (setting.exists) {
+                let data = setting.data();
+                if (data !== undefined) {
+                  priceRange = data.priceRange;
+                }
+              }
+
+              return {
+                id: doc.id,
+                name: doc.data().name,
+                avatar: doc.data().avatar,
+                bio,
+                low: priceRange.low,
+              };
+            }),
           );
+
+          setTargetUsers(users);
         });
 
       return () => {
@@ -162,6 +188,36 @@ const UserShopSearch = ({navigation, route}: any) => {
       };
     }, []),
   );
+
+  const getTargetUserFromIndex = async (users: Array<any>, index: number) => {
+    let bio = '',
+      priceRange = {low: 1500, high: 10000};
+
+    const profile = await profiles.doc(users[index].id).get();
+    const setting = await settings.doc(users[index].id).get();
+
+    if (profile.exists) {
+      let data = profile.data();
+      if (data !== undefined) {
+        bio = data.bio;
+      }
+    }
+
+    if (setting.exists) {
+      let data = setting.data();
+      if (data !== undefined) {
+        priceRange = data.priceRange;
+      }
+    }
+
+    return {
+      id: users[index].id,
+      name: users[index].data().name,
+      avatar: users[index].data().avatar,
+      bio,
+      low: priceRange.low,
+    };
+  };
 
   const handleFilter = async (filterName: Relation) => {
     dispatch(setLoading(true));
@@ -191,11 +247,8 @@ const UserShopSearch = ({navigation, route}: any) => {
         );
 
         if (index > -1) {
-          resultUsers.push({
-            id: users[index].data().user2,
-            name: users[index].data().name,
-            avatar: users[index].data().avatar,
-          });
+          let newUser = await getTargetUserFromIndex(users, index);
+          resultUsers.push(newUser);
         }
       }
 
@@ -205,11 +258,8 @@ const UserShopSearch = ({navigation, route}: any) => {
         );
 
         if (index > -1) {
-          resultUsers.push({
-            id: users[index].data().user1,
-            name: users[index].data().name,
-            avatar: users[index].data().avatar,
-          });
+          let newUser = await getTargetUserFromIndex(users, index);
+          resultUsers.push(newUser);
         }
       }
       console.log(resultUsers);
@@ -377,13 +427,10 @@ const UserShopSearch = ({navigation, route}: any) => {
                           size={20}
                           color={Colors.redBtn}
                         />
-                        <Text style={styles.label}>1,500円〜</Text>
+                        <Text style={styles.label}>{user.low}円〜</Text>
                       </View>
                       <Divider style={styles.divider} />
-                      <Text>
-                        ようこそ！ざっぶーん！ ここは海の中のメイドカフェ＆バー
-                        ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
-                      </Text>
+                      <Text>{user.bio}</Text>
                     </View>
                   </View>
                 </ImageBackground>
@@ -451,13 +498,10 @@ const UserShopSearch = ({navigation, route}: any) => {
                           size={20}
                           color={Colors.redBtn}
                         />
-                        <Text style={styles.label}>1,500円〜</Text>
+                        <Text style={styles.label}>{user.low}円〜</Text>
                       </View>
                       <Divider style={styles.divider} />
-                      <Text>
-                        ようこそ！ざっぶーん！ ここは海の中のメイドカフェ＆バー
-                        ご来店される王子様方がキュートでセクシーなマーメイドちゃんたちに癒され、
-                      </Text>
+                      <Text>{user.bio}</Text>
                     </View>
                   </View>
                 </ImageBackground>
