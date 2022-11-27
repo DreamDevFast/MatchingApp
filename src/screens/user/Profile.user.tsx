@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import {Appbar, Divider, Modal} from 'react-native-paper';
+import {Appbar, Divider, Modal, TextInput} from 'react-native-paper';
 import {Image, Text, View} from 'react-native-ui-lib';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -34,7 +34,7 @@ type Profile = {
   images: Array<string>;
 };
 
-const UserProfile = () => {
+const UserProfile = ({navigation}: any) => {
   const dispatch = useAppDispatch();
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
   const setting = useAppSelector((state: any) => state.setting);
@@ -188,6 +188,35 @@ const UserProfile = () => {
     setOpenImagePickerModal(true);
   };
 
+  const handleBio = (bioText: string) => {
+    setProfile({
+      ...profile,
+      bio: bioText,
+    });
+  };
+
+  const handleBack = async () => {
+    if (profile.id === undefined) {
+      try {
+        await profiles.doc(tempUser.id).set({
+          bio: profile.bio,
+          images: profile.images,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      try {
+        await profiles.doc(profile.id).update({
+          bio: profile.bio,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    navigation.navigate('UserDashBoard');
+  };
+
   return (
     <>
       <ScrollView>
@@ -218,9 +247,17 @@ const UserProfile = () => {
               <Text style={styles.label}>{setting.priceRange.low}円〜</Text>
             </View>
             <Divider style={styles.divider} />
-            <Text color={Colors.iconLabel}>
-              可愛い衣装を着たい！時給がいいところで働きたいです！ビジュアルに自信があります！
-            </Text>
+            <TextInput
+              selectionColor={Colors.iconLabel}
+              underlineColor={Colors.white}
+              activeUnderlineColor={Colors.white}
+              style={styles.bio_input}
+              theme={{colors: {text: Colors.iconLabel}}}
+              multiline={true}
+              numberOfLines={2}
+              onChangeText={handleBio}
+              value={profile.bio}
+            />
             <Divider style={styles.divider} />
             <View row style={styles.portfolio_container}>
               {profile.images.map((imageUri, key) => (
@@ -238,7 +275,12 @@ const UserProfile = () => {
             </View>
             <Divider style={styles.divider} />
             <View centerH paddingV-50>
-              <CustomButton color={Colors.redBtn} label="戻る" />
+              <CustomButton
+                color={Colors.redBtn}
+                labelStyle={styles.label_style}
+                label="戻る"
+                onPress={handleBack}
+              />
             </View>
           </View>
         </Container>
@@ -310,6 +352,12 @@ const styles = StyleSheet.create({
   },
   portfolio_container: {
     flexWrap: 'wrap',
+  },
+  label_style: {
+    color: Colors.white,
+  },
+  bio_input: {
+    backgroundColor: 'transparent',
   },
 });
 export default UserProfile;
