@@ -4,6 +4,8 @@ import Container from './Container';
 import {IconButton} from 'react-native-paper';
 import {View} from 'react-native-ui-lib';
 import {Colors} from '../styles';
+import {useAppDispatch} from '../redux/reduxHooks';
+import {setLoading} from '../redux/features/globalSlice';
 
 const {width, height} = Dimensions.get('window');
 
@@ -15,6 +17,8 @@ enum Relation {
 }
 
 const CustomTabnav = ({children, navigation, route, ...props}: any) => {
+  const dispatch = useAppDispatch();
+
   const [state, setState] = React.useState<{open: boolean}>({open: false});
 
   const onStateChange = ({open}: {open: boolean}) => setState({open: !open});
@@ -50,7 +54,10 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
             color={Colors.white}
             size={25}
             style={styles.iconButton}
-            onPress={() => navigation.navigate('UserShopSearch')}
+            onPress={() => {
+              dispatch(setLoading(true));
+              navigation.navigate('UserShopSearch');
+            }}
           />
         ) : (
           <View>
@@ -100,7 +107,10 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
               ? {...styles.iconButton, ...styles.highLight}
               : styles.iconButton
           }
-          onPress={() => navigation.navigate('UserChat')}
+          onPress={() => {
+            dispatch(setLoading(true));
+            navigation.navigate('UserChat');
+          }}
         />
       </View>
       {children}

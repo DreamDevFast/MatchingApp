@@ -121,6 +121,7 @@ const UserShopSearch = ({navigation, route}: any) => {
         });
 
         console.log('release: ', currentIndex);
+
         index++;
         Animated.timing(pan, {
           toValue: {
@@ -176,11 +177,13 @@ const UserShopSearch = ({navigation, route}: any) => {
                 avatar: doc.data().avatar,
                 bio,
                 low: priceRange.low,
+                hight: priceRange.high,
               };
             }),
           );
 
           setTargetUsers(users);
+          dispatch(setLoading(false));
         });
 
       return () => {
@@ -216,6 +219,7 @@ const UserShopSearch = ({navigation, route}: any) => {
       avatar: users[index].data().avatar,
       bio,
       low: priceRange.low,
+      high: priceRange.high,
     };
   };
 
@@ -321,6 +325,7 @@ const UserShopSearch = ({navigation, route}: any) => {
     if (index < targetUsers_alt.length) {
       setCurrentIndex(index);
     } else {
+      index = 0;
       setCurrentIndex(0);
     }
   };
@@ -365,75 +370,83 @@ const UserShopSearch = ({navigation, route}: any) => {
                 }}
                 {...panResponder.panHandlers}
               >
-                <ImageBackground
-                  source={
-                    user.avatar === 'default.png'
-                      ? defaultImage
-                      : {
-                          uri: user.avatar,
-                        }
+                <TouchableHighlight
+                  onPress={() =>
+                    navigation.navigate('UserShopDetail', {
+                      ...user,
+                    })
                   }
-                  style={styles.imagebackground}
-                  imageStyle={styles.image}
                 >
-                  <CustomStamp
-                    text={'like'}
-                    style={{
-                      ...styles.like_stamp,
-                      opacity: pan.x.interpolate({
-                        inputRange: [-width, 0, width],
-                        outputRange: [0, 0, 3],
-                      }),
-                    }}
-                    text_style={styles.like_text}
-                  />
-                  <CustomStamp
-                    text={'dislike'}
-                    style={{
-                      ...styles.dislike_stamp,
-                      opacity: pan.x.interpolate({
-                        inputRange: [-width, 0, width],
-                        outputRange: [3, 0, 0],
-                      }),
-                    }}
-                    text_style={styles.dislike_text}
-                  />
+                  <ImageBackground
+                    source={
+                      user.avatar === 'default.png'
+                        ? defaultImage
+                        : {
+                            uri: user.avatar,
+                          }
+                    }
+                    style={styles.imagebackground}
+                    imageStyle={styles.image}
+                  >
+                    <CustomStamp
+                      text={'like'}
+                      style={{
+                        ...styles.like_stamp,
+                        opacity: pan.x.interpolate({
+                          inputRange: [-width, 0, width],
+                          outputRange: [0, 0, 3],
+                        }),
+                      }}
+                      text_style={styles.like_text}
+                    />
+                    <CustomStamp
+                      text={'dislike'}
+                      style={{
+                        ...styles.dislike_stamp,
+                        opacity: pan.x.interpolate({
+                          inputRange: [-width, 0, width],
+                          outputRange: [3, 0, 0],
+                        }),
+                      }}
+                      text_style={styles.dislike_text}
+                    />
 
-                  <CustomStamp
-                    text={'favorite'}
-                    style={{
-                      ...styles.favorite_stamp,
-                      opacity: favoriteValue.interpolate({
-                        inputRange: [-width, 0, width],
-                        outputRange: [3, 0, 0],
-                      }),
-                    }}
-                    text_style={styles.favorite_text}
-                  />
+                    <CustomStamp
+                      text={'favorite'}
+                      style={{
+                        ...styles.favorite_stamp,
+                        opacity: favoriteValue.interpolate({
+                          inputRange: [-width, 0, width],
+                          outputRange: [3, 0, 0],
+                        }),
+                      }}
+                      text_style={styles.favorite_text}
+                    />
 
-                  <View bottom style={styles.container}>
-                    <View style={styles.desc}>
-                      <Text style={styles.title}>{user.name}</Text>
-                      <View row spread>
-                        <SimpleLineIcons
-                          name="location-pin"
-                          size={20}
-                          color={Colors.redBtn}
-                        />
-                        <Text style={styles.label}>池袋</Text>
-                        <View style={{width: width * 0.2}}></View>
-                        <MaterialCommunityIcons
-                          name="piggy-bank-outline"
-                          size={20}
-                          color={Colors.redBtn}
-                        />
-                        <Text style={styles.label}>{user.low}円〜</Text>
+                    <View bottom style={styles.container}>
+                      <View style={styles.desc}>
+                        <Text style={styles.title}>{user.name}</Text>
+                        <View row spread>
+                          <SimpleLineIcons
+                            name="location-pin"
+                            size={20}
+                            color={Colors.redBtn}
+                          />
+                          <Text style={styles.label}>池袋</Text>
+                          <View style={{width: width * 0.2}}></View>
+                          <MaterialCommunityIcons
+                            name="piggy-bank-outline"
+                            size={20}
+                            color={Colors.redBtn}
+                          />
+                          <Text style={styles.label}>{user.low}円〜</Text>
+                        </View>
+                        <Divider style={styles.divider} />
+                        <Text>{user.bio}</Text>
                       </View>
-                      <Divider style={styles.divider} />
-                      <Text>{user.bio}</Text>
                     </View>
-                  </View>
-                </ImageBackground>
+                  </ImageBackground>
+                </TouchableHighlight>
               </Animated.View>
             );
           } else if (key === 0) {
