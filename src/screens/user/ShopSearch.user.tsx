@@ -39,6 +39,7 @@ enum Relation {
 }
 
 var index = 0;
+var targetUsers_alt: Array<any>;
 
 const UserShopSearch = ({navigation, route}: any) => {
   const dispatch = useAppDispatch();
@@ -70,6 +71,9 @@ const UserShopSearch = ({navigation, route}: any) => {
   );
 
   const [direction, setDirection] = useState<1 | -1>(1);
+
+  targetUsers_alt = targetUsers;
+  index = currentIndex;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -120,8 +124,10 @@ const UserShopSearch = ({navigation, route}: any) => {
           useNativeDriver: false,
           duration: 0,
         }).start();
-        if (gestureState.dx >= width * 0.3) handleRelation(Relation.like)();
-        else if (gestureState.dx <= width * -0.3) {
+        if (gestureState.dx >= width * 0.3) {
+          console.log(index);
+          handleRelation(Relation.like)();
+        } else if (gestureState.dx <= width * -0.3) {
           handleRelation(Relation.dislike)();
         } else if (gestureState.dy <= width * -0.3)
           handleRelation(Relation.favorite)();
@@ -160,6 +166,7 @@ const UserShopSearch = ({navigation, route}: any) => {
       console.log('in', querySnapshot.size);
       const users = querySnapshot.docs;
       console.log(tempUser.id, filterName);
+      console.log(users);
       const relationQuerySnapshot1 = await relations
         .where('user1', '==', tempUser.id)
         .where('relation1', '==', filterName)
@@ -170,8 +177,8 @@ const UserShopSearch = ({navigation, route}: any) => {
         .get();
 
       let resultUsers = [];
-      console.log('relation1 size: ', relationQuerySnapshot1.size);
-      console.log('relation2 size: ', relationQuerySnapshot2.size);
+      console.log('relation1 size: ', relationQuerySnapshot1.docs);
+      console.log('relation2 size: ', relationQuerySnapshot2.docs);
       for (let i = 0; i < relationQuerySnapshot1.size; i++) {
         let index = users.findIndex(
           user => user.id === relationQuerySnapshot1.docs[i].data().user2,
@@ -179,9 +186,9 @@ const UserShopSearch = ({navigation, route}: any) => {
 
         if (index > -1) {
           resultUsers.push({
-            id: users[i].id,
-            name: users[i].data().name,
-            avatar: users[i].data().avatar,
+            id: users[index].data().user2,
+            name: users[index].data().name,
+            avatar: users[index].data().avatar,
           });
         }
       }
@@ -193,13 +200,13 @@ const UserShopSearch = ({navigation, route}: any) => {
 
         if (index > -1) {
           resultUsers.push({
-            id: users[i].id,
-            name: users[i].data().name,
-            avatar: users[i].data().avatar,
+            id: users[index].data().user1,
+            name: users[index].data().name,
+            avatar: users[index].data().avatar,
           });
         }
       }
-
+      console.log(resultUsers);
       setTargetUsers(resultUsers);
     }
 
@@ -208,7 +215,9 @@ const UserShopSearch = ({navigation, route}: any) => {
 
   const handleRelation = (relation: Relation) => () => {
     console.log('relation: ', relation);
-    const targetUser = targetUsers[currentIndex];
+    console.log('current index: ', index - 1);
+    console.log('target users: ', targetUsers_alt);
+    const targetUser = targetUsers_alt[index - 1];
     console.log(tempUser, targetUser);
 
     relations
@@ -253,13 +262,14 @@ const UserShopSearch = ({navigation, route}: any) => {
           }
         }
       });
-    if (currentIndex + 1 < targetUsers.length) {
-      setCurrentIndex(currentIndex + 1);
+    if (index < targetUsers.length) {
+      setCurrentIndex(index);
     } else {
       setCurrentIndex(0);
     }
   };
-  console.log('d');
+
+  // console.log(targetUsers_alt);
   return (
     <CustomTabnav
       navigation={navigation}
