@@ -46,6 +46,9 @@ const UserShopSearch = ({navigation, route}: any) => {
 
   const users = firestore().collection('Users');
   const relations = firestore().collection('Relations');
+  const settings = firestore().collection('Settings');
+  const profiles = firestore().collection('Profiles');
+
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
   const isLoading = useAppSelector((state: any) => state.global.isLoading);
 
@@ -105,7 +108,10 @@ const UserShopSearch = ({navigation, route}: any) => {
         }
         Animated.spring(pan, {
           toValue: {
-            x: (500 * gestureState.dx) / Math.abs(gestureState.dx),
+            x:
+              gestureState.dx === 0
+                ? 0
+                : width * (gestureState.dx / Math.abs(gestureState.dx)),
             y: 0,
           },
           useNativeDriver: false,
@@ -131,7 +137,7 @@ const UserShopSearch = ({navigation, route}: any) => {
           handleRelation(Relation.dislike)();
         } else if (gestureState.dy <= width * -0.3)
           handleRelation(Relation.favorite)();
-        setCurrentIndex(index);
+        else setCurrentIndex(index);
       },
     }),
   ).current;
@@ -262,7 +268,7 @@ const UserShopSearch = ({navigation, route}: any) => {
           }
         }
       });
-    if (index < targetUsers.length) {
+    if (index < targetUsers_alt.length) {
       setCurrentIndex(index);
     } else {
       setCurrentIndex(0);
@@ -277,8 +283,10 @@ const UserShopSearch = ({navigation, route}: any) => {
       handleFilter={handleFilter}
     >
       <Loader isLoading={isLoading} />
-      {targetUsers
-        .slice(currentIndex, currentIndex + 2)
+      {(currentIndex + 2 > targetUsers.length && targetUsers.length
+        ? [targetUsers[currentIndex], targetUsers[0]]
+        : targetUsers.slice(currentIndex, currentIndex + 2)
+      )
         .reverse()
         .map((user, key) => {
           if (key === 1) {
@@ -323,7 +331,7 @@ const UserShopSearch = ({navigation, route}: any) => {
                     style={{
                       ...styles.like_stamp,
                       opacity: pan.x.interpolate({
-                        inputRange: [-200, 0, 200],
+                        inputRange: [-width, 0, width],
                         outputRange: [0, 0, 3],
                       }),
                     }}
@@ -334,7 +342,7 @@ const UserShopSearch = ({navigation, route}: any) => {
                     style={{
                       ...styles.dislike_stamp,
                       opacity: pan.x.interpolate({
-                        inputRange: [-200, 0, 200],
+                        inputRange: [-width, 0, width],
                         outputRange: [3, 0, 0],
                       }),
                     }}
@@ -346,7 +354,7 @@ const UserShopSearch = ({navigation, route}: any) => {
                     style={{
                       ...styles.favorite_stamp,
                       opacity: favoriteValue.interpolate({
-                        inputRange: [-200, 0, 200],
+                        inputRange: [-width, 0, width],
                         outputRange: [3, 0, 0],
                       }),
                     }}
@@ -390,13 +398,25 @@ const UserShopSearch = ({navigation, route}: any) => {
                   transform: [
                     {
                       scaleX: pan.x.interpolate({
-                        inputRange: [-500, -200, 0, 200, 500],
+                        inputRange: [
+                          -width,
+                          -width * 0.3,
+                          0,
+                          width * 0.3,
+                          width,
+                        ],
                         outputRange: [1, 1, 0.9, 1, 1],
                       }),
                     },
                     {
                       scaleY: pan.x.interpolate({
-                        inputRange: [-500, -200, 0, 200, 500],
+                        inputRange: [
+                          -width,
+                          -width * 0.3,
+                          0,
+                          width * 0.3,
+                          width,
+                        ],
                         outputRange: [1, 1, 0.9, 1, 1],
                       }),
                     },
