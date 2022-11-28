@@ -37,17 +37,20 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
   return (
     <Container flex centerH>
       <View row spread bottom style={styles.toolBar}>
-        <IconButton
-          icon="user-alt"
-          color={route.name == 'UserDashBoard' ? Colors.redBtn : Colors.white}
-          size={25}
+        <View
           style={
             route.name == 'UserDashBoard'
               ? {...styles.iconButton, ...styles.highLight}
               : styles.iconButton
           }
-          onPress={() => navigation.navigate('UserDashBoard')}
-        />
+        >
+          <IconButton
+            icon="user-alt"
+            color={route.name == 'UserDashBoard' ? Colors.redBtn : Colors.white}
+            size={25}
+            onPress={() => navigation.navigate('UserDashBoard')}
+          />
+        </View>
         {route.name !== 'UserShopSearch' ? (
           <IconButton
             icon="fire"
@@ -61,57 +64,69 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
           />
         ) : (
           <View>
-            <IconButton
-              icon="fire"
-              color={Colors.redBtn}
-              size={25}
-              style={{...styles.iconButton, ...styles.highLight}}
-              onPress={() => onStateChange(state)}
-            />
+            <View
+              style={
+                route.name === 'UserShopSearch'
+                  ? {...styles.iconButton, ...styles.highLight}
+                  : styles.iconButton
+              }
+            >
+              <IconButton
+                icon="fire"
+                color={Colors.redBtn}
+                size={25}
+                onPress={() => onStateChange(state)}
+              />
+            </View>
             {open ? (
               <View style={styles.dropdown}>
-                <IconButton
-                  icon="times"
-                  color={Colors.white}
-                  style={styles.dislike}
-                  size={25}
-                  onPress={handleDropdownItem(Relation.dislike)}
-                />
-                <IconButton
-                  icon="star"
-                  color={Colors.white}
-                  style={styles.favorite}
-                  size={25}
-                  onPress={handleDropdownItem(Relation.favorite)}
-                />
-                <IconButton
-                  icon="heart"
-                  color={Colors.white}
-                  style={styles.like}
-                  size={25}
-                  onPress={handleDropdownItem(Relation.like)}
-                />
+                <View marginT-10 style={styles.dislike}>
+                  <IconButton
+                    icon="times"
+                    color={Colors.white}
+                    size={25}
+                    onPress={handleDropdownItem(Relation.dislike)}
+                  />
+                </View>
+                <View marginT-10 style={styles.favorite}>
+                  <IconButton
+                    icon="star"
+                    color={Colors.white}
+                    size={25}
+                    onPress={handleDropdownItem(Relation.favorite)}
+                  />
+                </View>
+                <View marginT-10 style={styles.like}>
+                  <IconButton
+                    icon="heart"
+                    color={Colors.white}
+                    size={25}
+                    onPress={handleDropdownItem(Relation.like)}
+                  />
+                </View>
               </View>
             ) : (
               <></>
             )}
           </View>
         )}
-
-        <IconButton
-          icon="comment"
-          color={route.name == 'UserChat' ? Colors.redBtn : Colors.white}
-          size={25}
+        <View
           style={
             route.name == 'UserChat'
               ? {...styles.iconButton, ...styles.highLight}
               : styles.iconButton
           }
-          onPress={() => {
-            dispatch(setLoading(true));
-            navigation.navigate('UserChat');
-          }}
-        />
+        >
+          <IconButton
+            icon="comment"
+            color={route.name == 'UserChat' ? Colors.redBtn : Colors.white}
+            size={25}
+            onPress={() => {
+              dispatch(setLoading(true));
+              navigation.navigate('UserChat');
+            }}
+          />
+        </View>
       </View>
       {children}
     </Container>
@@ -124,11 +139,11 @@ const styles = StyleSheet.create({
     height: height * 0.12,
   },
   iconButton: {
-    marginBottom: -15,
     zIndex: 1,
   },
   highLight: {
     backgroundColor: Colors.white,
+    borderRadius: 30,
   },
   group_style: {
     marginBottom: -55,

@@ -155,37 +155,40 @@ const DefaultTab = ({navigation}: any) => {
       </View>
       <View row spread marginT-10 style={styles.toolBar1}>
         <View centerH>
-          <IconButton
-            icon="cog"
-            color={Colors.back}
-            style={styles.whiteIcon}
-            rippleColor={Colors.white}
-            size={25}
-            onPress={() => navigation.navigate('UserSetting')}
-          />
+          <View style={styles.whiteIcon}>
+            <IconButton
+              icon="cog"
+              color={Colors.back}
+              rippleColor={Colors.white}
+              size={25}
+              onPress={() => navigation.navigate('UserSetting')}
+            />
+          </View>
           <Text style={styles.iconLabel}>設定</Text>
         </View>
         <View centerH>
-          <IconButton
-            icon="pencil-alt"
-            color={Colors.back}
-            style={styles.whiteIcon}
-            rippleColor={Colors.white}
-            size={25}
-            onPress={() => navigation.navigate('UserProfile')}
-          />
+          <View style={styles.whiteIcon}>
+            <IconButton
+              icon="pencil-alt"
+              color={Colors.back}
+              rippleColor={Colors.white}
+              size={25}
+              onPress={() => navigation.navigate('UserProfile')}
+            />
+          </View>
           <Text style={styles.iconLabel}>プロフィール</Text>
         </View>
       </View>
       <View centerH>
-        <IconButton
-          icon="camera"
-          color={Colors.redBtn}
-          rippleColor={Colors.white}
-          style={styles.whiteIcon}
-          size={40}
-          onPress={() => setOpenImagePickerModal(true)}
-        />
+        <View style={styles.whiteIcon}>
+          <IconButton
+            icon="camera"
+            color={Colors.redBtn}
+            rippleColor={Colors.white}
+            size={40}
+            onPress={() => setOpenImagePickerModal(true)}
+          />
+        </View>
         <Text style={styles.iconLabel}>画像を追加</Text>
       </View>
       <Modal
@@ -465,6 +468,7 @@ const styles = StyleSheet.create({
   },
   whiteIcon: {
     backgroundColor: Colors.white,
+    borderRadius: 50,
   },
   iconLabel: {
     fontSize: 10,
@@ -487,4 +491,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
 });
+
 export default UserDashBoard;

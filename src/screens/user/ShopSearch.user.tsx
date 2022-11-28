@@ -522,41 +522,46 @@ const UserShopSearch = ({navigation, route}: any) => {
             );
           }
         })}
-      <IconButton
-        icon="undo"
-        color={Colors.white}
-        style={styles.return}
-        size={15}
-        onPress={handleRelation(Relation.like)}
-      />
-      <IconButton
-        icon="times"
-        color={Colors.white}
-        style={styles.dislike}
-        size={20}
-        onPress={handleRelation(Relation.dislike)}
-      />
-      <IconButton
-        icon="star"
-        color={Colors.white}
-        style={styles.favorite}
-        size={15}
-        onPress={handleRelation(Relation.favorite)}
-      />
-      <IconButton
-        icon="heart"
-        color={Colors.white}
-        style={styles.like}
-        size={20}
-        onPress={handleRelation(Relation.like)}
-      />
-      <IconButton
-        icon="bolt"
-        color={Colors.white}
-        style={styles.boost}
-        size={15}
-        onPress={handleRelation(Relation.like)}
-      />
+      <View style={styles.return} centerH centerV>
+        <IconButton
+          icon="undo"
+          color={Colors.white}
+          size={15}
+          onPress={handleRelation(Relation.like)}
+        />
+      </View>
+      <View style={styles.dislike} centerH centerV>
+        <IconButton
+          icon="times"
+          color={Colors.white}
+          size={20}
+          onPress={handleRelation(Relation.dislike)}
+        />
+      </View>
+      <View style={styles.favorite} centerH centerV>
+        <IconButton
+          icon="star"
+          color={Colors.white}
+          size={15}
+          onPress={handleRelation(Relation.favorite)}
+        />
+      </View>
+      <View style={styles.like} centerH centerV>
+        <IconButton
+          icon="heart"
+          color={Colors.white}
+          size={20}
+          onPress={handleRelation(Relation.like)}
+        />
+      </View>
+      <View style={styles.boost} centerH centerV>
+        <IconButton
+          icon="bolt"
+          color={Colors.white}
+          size={15}
+          onPress={handleRelation(Relation.like)}
+        />
+      </View>
     </CustomTabnav>
   );
 };
