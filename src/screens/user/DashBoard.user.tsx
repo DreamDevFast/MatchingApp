@@ -235,6 +235,7 @@ const UserDashBoard = ({navigation, route}: any) => {
 
   useFocusEffect(
     useCallback(() => {
+      console.log(isEntering);
       if (isEntering) {
         relatoins
           .where('user1', '==', tempUser.id)
@@ -339,7 +340,7 @@ const UserDashBoard = ({navigation, route}: any) => {
 
                 console.log('docs', docs.length);
                 if (docs.length) {
-                  setNewMatchedUsers(docs);
+                  dispatch(setNewMatchedUsers(docs));
                 }
               });
           });
