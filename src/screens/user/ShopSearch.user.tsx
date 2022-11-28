@@ -25,6 +25,7 @@ import CustomTabnav from '../../components/CustomTabnav';
 import {Colors} from '../../styles';
 import CustomStamp from '../../components/CustomStamp';
 import Loader from '../../components/Loader';
+import {pref_city} from '../../constants/config';
 
 const defaultImage = require('../../assets/images/empty.jpg');
 
@@ -149,38 +150,92 @@ const UserShopSearch = ({navigation, route}: any) => {
         .where('role', '!=', tempUser.role)
         .get()
         .then(async querySnapshot => {
-          const users = await Promise.all(
-            querySnapshot.docs.map(async doc => {
-              const profile = await profiles.doc(doc.id).get();
-              const setting = await settings.doc(doc.id).get();
+          const mySetting = await settings.doc(tempUser.id).get();
+          const users = [];
+          for (let i = 0; i < querySnapshot.docs.length; i++) {
+            const doc = querySnapshot.docs[i];
+            const profile = await profiles.doc(doc.id).get();
+            const setting = await settings.doc(doc.id).get();
 
-              let bio = '',
-                priceRange = {low: 1500, high: 10000};
+            let bio = '',
+              priceRange = {low: 1500, high: 10000};
 
-              if (profile.exists) {
-                let data = profile.data();
-                if (data !== undefined) {
-                  bio = data.bio;
+            if (profile.exists) {
+              let data = profile.data();
+              if (data !== undefined) {
+                bio = data.bio;
+              }
+            }
+
+            if (setting.exists) {
+              let data = setting.data();
+              if (data !== undefined) {
+                priceRange = data.priceRange;
+              }
+            }
+
+            // filter by setting
+            if (tempUser.role === 'girl') {
+              if (mySetting.exists) {
+                const data = mySetting.data();
+                if (data) {
+                  const {
+                    searchLocation,
+                    keyword,
+                    priceRange: myPriceRange,
+                  } = data;
+                  if (
+                    searchLocation &&
+                    searchLocation !== doc.data().prefecture
+                  )
+                    continue;
+                  if (
+                    myPriceRange.low > priceRange.high ||
+                    myPriceRange.high < priceRange.low
+                  )
+                    continue;
+                  if (
+                    keyword &&
+                    !doc.data().name.includes(keyword) &&
+                    !bio.includes(keyword)
+                  )
+                    continue;
                 }
               }
+            } else if (tempUser.role === 'shop') {
+              const data = mySetting.data();
+              if (data) {
+                const {ageRange, priceRange: myPriceRange} = data;
+                if (
+                  myPriceRange.low > priceRange.high ||
+                  myPriceRange.high < priceRange.low
+                )
+                  continue;
+                const birthday = new Date(tempUser.birthday);
+                const age = new Date().getFullYear() - birthday.getFullYear();
 
-              if (setting.exists) {
-                let data = setting.data();
-                if (data !== undefined) {
-                  priceRange = data.priceRange;
-                }
+                if (age < ageRange.low || age > ageRange.high) continue;
               }
+            }
+            // filtered by setting
 
-              return {
-                id: doc.id,
-                name: doc.data().name,
-                avatar: doc.data().avatar,
-                bio,
-                low: priceRange.low,
-                hight: priceRange.high,
-              };
-            }),
-          );
+            const matchedPrefs = pref_city.filter(
+              each => each.id === doc.data().prefecture,
+            );
+            let prefecture_name = '';
+            if (matchedPrefs.length) {
+              prefecture_name = matchedPrefs[0].pref;
+            }
+            users.push({
+              id: doc.id,
+              name: doc.data().name,
+              avatar: doc.data().avatar,
+              prefecture_name,
+              bio,
+              low: priceRange.low,
+              hight: priceRange.high,
+            });
+          }
 
           setTargetUsers(users);
           dispatch(setLoading(false));
@@ -213,10 +268,19 @@ const UserShopSearch = ({navigation, route}: any) => {
       }
     }
 
+    const matchedPrefs = pref_city.filter(
+      each => each.id === users[index].data().prefecture,
+    );
+    let prefecture_name = '';
+    if (matchedPrefs.length) {
+      prefecture_name = matchedPrefs[0].pref;
+    }
+
     return {
       id: users[index].id,
       name: users[index].data().name,
       avatar: users[index].data().avatar,
+      prefecture_name,
       bio,
       low: priceRange.low,
       high: priceRange.high,
@@ -432,7 +496,9 @@ const UserShopSearch = ({navigation, route}: any) => {
                             size={20}
                             color={Colors.redBtn}
                           />
-                          <Text style={styles.label}>池袋</Text>
+                          <Text style={styles.label}>
+                            {user.prefecture_name}
+                          </Text>
                           <View style={{width: width * 0.2}}></View>
                           <MaterialCommunityIcons
                             name="piggy-bank-outline"

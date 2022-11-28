@@ -231,117 +231,130 @@ const UserDashBoard = ({navigation, route}: any) => {
   const isEntering = useAppSelector((state: any) => state.global.isEntering);
 
   const users = firestore().collection('Users');
-  const relatoins = firestore().collection('Relations');
+  const relations = firestore().collection('Relations');
+  const settings = firestore().collection('Settings');
 
   useFocusEffect(
     useCallback(() => {
       console.log(isEntering);
       if (isEntering) {
-        relatoins
-          .where('user1', '==', tempUser.id)
-          .where('relation1', 'in', [Relation.favorite, Relation.like])
+        settings
+          .doc(tempUser.id)
           .get()
-          .then(querySnapshot1 => {
-            relatoins
-              .where('user2', '==', tempUser.id)
-              .where('relation2', 'in', [Relation.favorite, Relation.like])
+          .then(docSnapshot => {
+            if (!docSnapshot.exists) return;
+            const docData = docSnapshot.data();
+            if (docData) {
+              if (!docData.isNotifying) return;
+            } else {
+              return;
+            }
+            relations
+              .where('user1', '==', tempUser.id)
+              .where('relation1', 'in', [Relation.favorite, Relation.like])
               .get()
-              .then(async querySnapshot2 => {
-                let docs = [];
-                if (querySnapshot1.size) {
-                  docs.push(
-                    ...(await Promise.all(
-                      querySnapshot1.docs
-                        .filter(doc => {
-                          const data = doc.data();
-                          if (data) {
-                            if (
-                              data.checked1 === 1 ||
-                              data.relation2 === Relation.initial
-                            )
-                              return false;
-                            else return true;
-                          } else {
-                            return false;
-                          }
-                        })
-                        .map(async doc => {
-                          const docSnapshot = await users
-                            .doc(doc.data().user2)
-                            .get();
-                          const data = docSnapshot.data();
-                          if (data)
-                            return {
-                              id: doc.id,
-                              userId: docSnapshot.id,
-                              name: data.name,
-                              avatar: data.avatar,
-                              relation: doc.data().relation2,
-                              whichChecked: 'checked1', // it means if tempUser is user1 or user2
-                            };
-                          else
-                            return {
-                              id: doc.id,
-                              userId: docSnapshot.id,
-                              name: '',
-                              avatar: 'default.png',
-                              relation: doc.data().relation2,
-                              whichChecked: 'checked1',
-                            };
-                        }),
-                    )),
-                  );
-                }
+              .then(querySnapshot1 => {
+                relations
+                  .where('user2', '==', tempUser.id)
+                  .where('relation2', 'in', [Relation.favorite, Relation.like])
+                  .get()
+                  .then(async querySnapshot2 => {
+                    let docs = [];
+                    if (querySnapshot1.size) {
+                      docs.push(
+                        ...(await Promise.all(
+                          querySnapshot1.docs
+                            .filter(doc => {
+                              const data = doc.data();
+                              if (data) {
+                                if (
+                                  data.checked1 === 1 ||
+                                  data.relation2 === Relation.initial
+                                )
+                                  return false;
+                                else return true;
+                              } else {
+                                return false;
+                              }
+                            })
+                            .map(async doc => {
+                              const docSnapshot = await users
+                                .doc(doc.data().user2)
+                                .get();
+                              const data = docSnapshot.data();
+                              if (data)
+                                return {
+                                  id: doc.id,
+                                  userId: docSnapshot.id,
+                                  name: data.name,
+                                  avatar: data.avatar,
+                                  relation: doc.data().relation2,
+                                  whichChecked: 'checked1', // it means if tempUser is user1 or user2
+                                };
+                              else
+                                return {
+                                  id: doc.id,
+                                  userId: docSnapshot.id,
+                                  name: '',
+                                  avatar: 'default.png',
+                                  relation: doc.data().relation2,
+                                  whichChecked: 'checked1',
+                                };
+                            }),
+                        )),
+                      );
+                    }
 
-                if (querySnapshot2.size) {
-                  docs.push(
-                    ...(await Promise.all(
-                      querySnapshot2.docs
-                        .filter(doc => {
-                          const data = doc.data();
-                          if (data) {
-                            if (
-                              data.checked2 === 1 ||
-                              data.relation1 === Relation.initial
-                            )
-                              return false;
-                            else return true;
-                          } else {
-                            return false;
-                          }
-                        })
-                        .map(async doc => {
-                          const docSnapshot = await users
-                            .doc(doc.data().user1)
-                            .get();
-                          const data = docSnapshot.data();
-                          if (data)
-                            return {
-                              id: doc.id,
-                              userId: docSnapshot.id,
-                              name: data.name,
-                              avatar: data.avatar,
-                              relation: doc.data().relation1,
-                              whichChecked: 'checked2',
-                            };
-                          else
-                            return {
-                              id: doc.id,
-                              userId: docSnapshot.id,
-                              name: '',
-                              avatar: 'default.png',
-                              relation: doc.data().relation1,
-                              whichChecked: 'checked2',
-                            };
-                        }),
-                    )),
-                  );
-                }
+                    if (querySnapshot2.size) {
+                      docs.push(
+                        ...(await Promise.all(
+                          querySnapshot2.docs
+                            .filter(doc => {
+                              const data = doc.data();
+                              if (data) {
+                                if (
+                                  data.checked2 === 1 ||
+                                  data.relation1 === Relation.initial
+                                )
+                                  return false;
+                                else return true;
+                              } else {
+                                return false;
+                              }
+                            })
+                            .map(async doc => {
+                              const docSnapshot = await users
+                                .doc(doc.data().user1)
+                                .get();
+                              const data = docSnapshot.data();
+                              if (data)
+                                return {
+                                  id: doc.id,
+                                  userId: docSnapshot.id,
+                                  name: data.name,
+                                  avatar: data.avatar,
+                                  relation: doc.data().relation1,
+                                  whichChecked: 'checked2',
+                                };
+                              else
+                                return {
+                                  id: doc.id,
+                                  userId: docSnapshot.id,
+                                  name: '',
+                                  avatar: 'default.png',
+                                  relation: doc.data().relation1,
+                                  whichChecked: 'checked2',
+                                };
+                            }),
+                        )),
+                      );
+                    }
 
-                console.log('docs', docs.length);
-                if (docs.length) {
-                  dispatch(setNewMatchedUsers(docs));
-                }
+                    console.log('docs', docs.length);
+                    if (docs.length) {
+                      dispatch(setNewMatchedUsers(docs));
+                    }
+                  });
               });
           });
       }
@@ -350,7 +363,7 @@ const UserDashBoard = ({navigation, route}: any) => {
 
   const changeCheckState = (user: any) => {
     console.log(user.id);
-    relatoins
+    relations
       .doc(user.id)
       .update({
         [user.whichChecked]: 1, // It represents that the relation is
