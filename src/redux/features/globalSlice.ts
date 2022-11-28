@@ -19,6 +19,8 @@ export interface GlobalState {
   isAuthenticated: boolean;
   tempUser: TempUser | undefined;
   loginMethod: 'email' | 'mobile';
+  newMatchedUsers: Array<any>;
+  isEntering: boolean;
 }
 
 const initialState: GlobalState = {
@@ -36,6 +38,8 @@ const initialState: GlobalState = {
     role: 'girl',
   },
   loginMethod: 'email',
+  newMatchedUsers: [],
+  isEntering: true,
 };
 
 type setLoginMethodPayload = 'email' | 'mobile';
@@ -54,6 +58,8 @@ type setTempUserPayload = {
 
 type setLoadingPayload = boolean;
 type setAuthenticatedPayload = boolean;
+type setNewMatchedUsersPayload = Array<any>;
+type setEnteringPayload = boolean;
 
 export const globalSlice = createSlice({
   name: 'global',
@@ -76,6 +82,15 @@ export const globalSlice = createSlice({
     ) => {
       state.isAuthenticated = action.payload;
     },
+    setNewMatchedUsers: (
+      state,
+      action: PayloadAction<setNewMatchedUsersPayload>,
+    ) => {
+      state.newMatchedUsers = action.payload;
+    },
+    setEntering: (state, action: PayloadAction<setEnteringPayload>) => {
+      state.isEntering = action.payload;
+    },
   },
 });
 
@@ -84,6 +99,8 @@ export const {
   setLoading,
   setLoginMethod,
   setAuthenticated,
+  setNewMatchedUsers,
+  setEntering,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

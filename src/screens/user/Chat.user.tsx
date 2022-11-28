@@ -49,8 +49,10 @@ const UserChat = ({navigation, route}: any) => {
               return (
                 (doc.data().user2 === tempUser.id ||
                   doc.data().user2 === userDoc.id) &&
-                doc.data().relation1 === Relation.like &&
-                doc.data().relation2 === Relation.like
+                (doc.data().relation1 === Relation.like ||
+                  doc.data().relation1 === Relation.favorite) &&
+                (doc.data().relation2 === Relation.like ||
+                  doc.data().relation2 === Relation.favorite)
               );
             });
             console.log(result);

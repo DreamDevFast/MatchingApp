@@ -1,5 +1,12 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {StyleSheet, Pressable, Platform, BackHandler} from 'react-native';
+import {
+  StyleSheet,
+  Pressable,
+  Platform,
+  BackHandler,
+  Dimensions,
+  ImageBackground,
+} from 'react-native';
 import {IconButton, Modal} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -9,16 +16,30 @@ import firestore from '@react-native-firebase/firestore';
 
 import {CustomButton, Container, CustomText} from '../../components';
 import {Colors} from '../../styles';
-import {Text, View, Avatar} from 'react-native-ui-lib';
+import {Text, View, Avatar, Carousel} from 'react-native-ui-lib';
 import UserShopSearch from './ShopSearch.user';
 import CustomTabnav from '../../components/CustomTabnav';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
-import {setTempUser, setLoading} from '../../redux/features/globalSlice';
+import {
+  setTempUser,
+  setLoading,
+  setNewMatchedUsers,
+  setEntering,
+} from '../../redux/features/globalSlice';
 import Loader from '../../components/Loader';
 import {useFocusEffect} from '@react-navigation/native';
 
 const userIcon = require('../../assets/images/user.png');
+const defaultImage = require('../../assets/images/empty.jpg');
+const {width, height} = Dimensions.get('window');
+
+enum Relation {
+  initial,
+  like,
+  dislike,
+  favorite,
+}
 
 const DefaultTab = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
@@ -196,11 +217,240 @@ const DefaultTab = ({navigation}: any) => {
     </>
   );
 };
+
 const UserDashBoard = ({navigation, route}: any) => {
+  const dispatch = useAppDispatch();
+
+  const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const newMatchedUsers = useAppSelector(
+    (state: any) => state.global.newMatchedUsers,
+  );
+  const isEntering = useAppSelector((state: any) => state.global.isEntering);
+
+  const users = firestore().collection('Users');
+  const relatoins = firestore().collection('Relations');
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isEntering) {
+        relatoins
+          .where('user1', '==', tempUser.id)
+          .where('relation1', 'in', [Relation.favorite, Relation.like])
+          .get()
+          .then(querySnapshot1 => {
+            relatoins
+              .where('user2', '==', tempUser.id)
+              .where('relation2', 'in', [Relation.favorite, Relation.like])
+              .get()
+              .then(async querySnapshot2 => {
+                let docs = [];
+                if (querySnapshot1.size) {
+                  docs.push(
+                    ...(await Promise.all(
+                      querySnapshot1.docs
+                        .filter(doc => {
+                          const data = doc.data();
+                          if (data) {
+                            if (
+                              data.checked1 === 1 ||
+                              data.relation2 === Relation.initial
+                            )
+                              return false;
+                            else return true;
+                          } else {
+                            return false;
+                          }
+                        })
+                        .map(async doc => {
+                          const docSnapshot = await users
+                            .doc(doc.data().user2)
+                            .get();
+                          const data = docSnapshot.data();
+                          if (data)
+                            return {
+                              id: doc.id,
+                              userId: docSnapshot.id,
+                              name: data.name,
+                              avatar: data.avatar,
+                              relation: doc.data().relation2,
+                              whichChecked: 'checked1', // it means if tempUser is user1 or user2
+                            };
+                          else
+                            return {
+                              id: doc.id,
+                              userId: docSnapshot.id,
+                              name: '',
+                              avatar: 'default.png',
+                              relation: doc.data().relation2,
+                              whichChecked: 'checked1',
+                            };
+                        }),
+                    )),
+                  );
+                }
+
+                if (querySnapshot2.size) {
+                  docs.push(
+                    ...(await Promise.all(
+                      querySnapshot2.docs
+                        .filter(doc => {
+                          const data = doc.data();
+                          if (data) {
+                            if (
+                              data.checked2 === 1 ||
+                              data.relation1 === Relation.initial
+                            )
+                              return false;
+                            else return true;
+                          } else {
+                            return false;
+                          }
+                        })
+                        .map(async doc => {
+                          const docSnapshot = await users
+                            .doc(doc.data().user1)
+                            .get();
+                          const data = docSnapshot.data();
+                          if (data)
+                            return {
+                              id: doc.id,
+                              userId: docSnapshot.id,
+                              name: data.name,
+                              avatar: data.avatar,
+                              relation: doc.data().relation1,
+                              whichChecked: 'checked2',
+                            };
+                          else
+                            return {
+                              id: doc.id,
+                              userId: docSnapshot.id,
+                              name: '',
+                              avatar: 'default.png',
+                              relation: doc.data().relation1,
+                              whichChecked: 'checked2',
+                            };
+                        }),
+                    )),
+                  );
+                }
+
+                console.log('docs', docs.length);
+                if (docs.length) {
+                  setNewMatchedUsers(docs);
+                }
+              });
+          });
+      }
+    }, []),
+  );
+
+  const changeCheckState = (user: any) => {
+    console.log(user.id);
+    relatoins
+      .doc(user.id)
+      .update({
+        [user.whichChecked]: 1, // It represents that the relation is
+      })
+      .then(() => console.log('check state changed'));
+  };
+
+  const renderItem = (user: any, key: number) => {
+    console.log('length', user.name, user.avatar);
+    return (
+      <ImageBackground
+        key={key}
+        source={
+          user.avatar === 'default.png' ? defaultImage : {uri: user.avatar}
+        }
+        blurRadius={4}
+      >
+        <View centerV centerH style={styles.item}>
+          <View row centerV spread marginB-30 style={{width: width * 0.8}}>
+            <Avatar
+              size={width * 0.2}
+              source={
+                user.avatar === 'default.png'
+                  ? userIcon
+                  : {
+                      uri: user.avatar,
+                    }
+              }
+              label={'IMG'}
+              imageStyle={styles.avatar}
+            />
+            <Ionicons
+              name={
+                user.relatoin === Relation.dislike ? 'close-sharp' : 'heart'
+              }
+              color={Colors.white}
+              size={width * 0.15}
+            />
+            <Avatar
+              size={width * 0.2}
+              source={
+                user.avatar === 'default.png'
+                  ? userIcon
+                  : {
+                      uri: tempUser.avatar,
+                    }
+              }
+              label={'IMG'}
+              imageStyle={styles.avatar}
+            />
+          </View>
+          {user.relation === Relation.like ||
+          user.relation === Relation.favorite ? (
+            <CustomButton
+              color={Colors.redBtn}
+              labelStyle={styles.label_style}
+              label="メッセージを送る"
+              onPress={() => {
+                changeCheckState(user);
+                dispatch(setEntering(false));
+                navigation.navigate('UserChatRoom', {
+                  id: user.userId,
+                  name: user.name,
+                  avatar: user.avatar,
+                });
+              }}
+            />
+          ) : (
+            <></>
+          )}
+          <View marginB-10></View>
+          <CustomButton
+            color={'transparent'}
+            labelStyle={styles.label_style}
+            label="戻る"
+            onPress={() => {
+              changeCheckState(user);
+              dispatch(setEntering(false));
+              dispatch(setNewMatchedUsers([]));
+            }}
+          />
+        </View>
+      </ImageBackground>
+    );
+  };
+
   return (
-    <CustomTabnav navigation={navigation} route={route}>
-      <DefaultTab navigation={navigation} />
-    </CustomTabnav>
+    <>
+      {newMatchedUsers.length ? (
+        <Carousel
+          onChangePage={(nextPage: number, oldPage: number) =>
+            changeCheckState(newMatchedUsers[oldPage])
+          }
+        >
+          {newMatchedUsers.map((user: any, key: number) => {
+            return renderItem(user, key);
+          })}
+        </Carousel>
+      ) : (
+        <CustomTabnav navigation={navigation} route={route}>
+          <DefaultTab navigation={navigation} />
+        </CustomTabnav>
+      )}
+    </>
   );
 };
 
@@ -218,7 +468,23 @@ const styles = StyleSheet.create({
   },
   iconLabel: {
     fontSize: 10,
+    color: Colors.white,
+  },
+  name: {
     color: Colors.iconLabel,
+    fontSize: 30,
+  },
+  item: {
+    height: height,
+    width: width,
+    backgroundColor: 'transparent',
+  },
+  label_style: {
+    color: Colors.white,
+  },
+  avatar: {
+    borderColor: Colors.white,
+    borderWidth: 2,
   },
 });
 export default UserDashBoard;

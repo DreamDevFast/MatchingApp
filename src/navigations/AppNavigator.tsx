@@ -17,6 +17,7 @@ import {
   UserChat,
   UserChatRoom,
   PhoneVerification,
+  Help,
 } from '../screens';
 import AnimationTest from '../screens/AnimationTest';
 
@@ -52,6 +53,7 @@ const AppNavigator = () => {
         <Stack.Screen name="UserShopDetail" component={UserShopDetail} />
         <Stack.Screen name="UserChat" component={UserChat} />
         <Stack.Screen name="UserChatRoom" component={UserChatRoom} />
+        <Stack.Screen name="Help" component={Help} />
       </Stack.Navigator>
     </NavigationContainer>
   );
