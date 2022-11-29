@@ -152,6 +152,7 @@ const UserShopSearch = ({navigation, route}: any) => {
         .then(async querySnapshot => {
           const mySetting = await settings.doc(tempUser.id).get();
           const users = [];
+          console.log(querySnapshot.docs.length);
           for (let i = 0; i < querySnapshot.docs.length; i++) {
             const doc = querySnapshot.docs[i];
             const profile = await profiles.doc(doc.id).get();
@@ -211,9 +212,9 @@ const UserShopSearch = ({navigation, route}: any) => {
                   myPriceRange.high < priceRange.low
                 )
                   continue;
-                const birthday = new Date(tempUser.birthday);
+                const birthday = new Date(doc.data().birthday.seconds * 1000);
                 const age = new Date().getFullYear() - birthday.getFullYear();
-
+                console.log(age);
                 if (age < ageRange.low || age > ageRange.high) continue;
               }
             }
@@ -236,7 +237,7 @@ const UserShopSearch = ({navigation, route}: any) => {
               hight: priceRange.high,
             });
           }
-
+          console.log(users);
           setTargetUsers(users);
           dispatch(setLoading(false));
         });
