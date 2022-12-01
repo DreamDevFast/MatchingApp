@@ -61,6 +61,7 @@ const Chart = () => {
     {name: '11', uv: 0, pv: 2400, amt: 2400},
     {name: '12', uv: 0, pv: 2400, amt: 2400},
   ]);
+
   useEffect(() => {
     const q = query(
       collection(db, 'Relations'),
@@ -98,7 +99,7 @@ const Chart = () => {
   }, [year]);
 
   return (
-    <Card sx={{padding: 2, marginTop: 1}}>
+    <Card sx={{padding: 2, marginTop: 2}}>
       <Box
         sx={{
           padding: 4,

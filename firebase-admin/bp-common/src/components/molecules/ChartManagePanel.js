@@ -1,4 +1,5 @@
 import React from 'react';
+import Analytics from '../atoms/Analytics';
 import Chart from '../atoms/Chart';
 
 const ChartManagePanel = () => {
@@ -11,7 +12,7 @@ const ChartManagePanel = () => {
       }}
     >
       <Chart />
-      <Chart />
+      <Analytics />
     </div>
   );
 };
