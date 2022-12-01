@@ -368,6 +368,7 @@ const UserShopSearch = ({navigation, route}: any) => {
             .doc(docId)
             .update({
               [whichRelation]: relation,
+              updatedAt: new Date(),
             })
             .then(() => console.log('Updated'));
         } else {
@@ -382,6 +383,7 @@ const UserShopSearch = ({navigation, route}: any) => {
                 relation1: relation,
                 user2: targetUser.id,
                 relation2: Relation.initial,
+                updatedAt: new Date(),
               })
               .then(() => console.log('Added'));
           }

@@ -59,6 +59,7 @@ const LocationInput = ({navigation}: any) => {
       address,
       avatar,
       role,
+      createdAt: new Date(),
     });
 
     console.log('save succeeded!', documentSnapShot.id);
