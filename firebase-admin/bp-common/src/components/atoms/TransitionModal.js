@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Backdrop from '@mui/material/Backdrop';
+import {Backdrop, Select, MenuItem} from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import AddIcon from '@mui/icons-material/Add';
@@ -8,6 +8,7 @@ import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import {db} from '../../firebase';
 import {collection, addDoc} from 'firebase/firestore';
+import {pref_city} from '../../config';
 
 const style = {
   position: 'absolute',
@@ -27,7 +28,7 @@ export default function TransitionsModal() {
   const [mobile, setMobile] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [address, setAddress] = React.useState('');
-  const [prefecture, setPrefecture] = React.useState('');
+  const [prefecture, setPrefecture] = React.useState(pref_city[0].id);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -40,7 +41,7 @@ export default function TransitionsModal() {
       avatar: 'default.png',
       address,
       role: 'shop',
-      prefecture: '01',
+      prefecture,
       birthday: new Date(),
       createdAt: new Date(),
     }).then(docRef => {
@@ -103,6 +104,20 @@ export default function TransitionsModal() {
                 }}
                 sx={{width: '100%'}}
               />
+            </Box>
+            <Box sx={{padding: 1, width: '100%'}}>
+              <Select
+                value={prefecture}
+                sx={{width: '100%'}}
+                onChange={e => setPrefecture(e.target.value)}
+                label={'住所'}
+              >
+                {pref_city.map((pref, key) => (
+                  <MenuItem key={key} value={pref.id}>
+                    {pref.pref}
+                  </MenuItem>
+                ))}
+              </Select>
             </Box>
             <Box sx={{padding: 1, width: '100%'}}>
               <TextField

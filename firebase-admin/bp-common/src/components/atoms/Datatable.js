@@ -24,6 +24,9 @@ const columns = [
 
 const Datatable = ({users}) => {
   const rows = users.map(user => {
+    const date = user.data.createdAt
+      ? new Date(user.data.createdAt.seconds * 1000)
+      : '';
     return {
       id: user.id,
       name: {
@@ -32,6 +35,10 @@ const Datatable = ({users}) => {
       },
       mobile: user.data.mobile,
       email: user.data.email,
+      date: user.data.createdAt
+        ? `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+        : '',
+      matchingNumber: user.matchingCount,
     };
   });
 
