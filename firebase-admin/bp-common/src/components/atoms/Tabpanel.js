@@ -9,6 +9,8 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import TransitionsModal from './TransitionModal';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
 const TabPanel = props => {
   const {children, value, index} = props;
@@ -19,7 +21,15 @@ const TabPanel = props => {
       collection(db, 'Users'),
       where('role', '==', value === 0 ? 'girl' : 'shop'),
     );
-    onSnapshot(q, querySnapshot => {
+    onSnapshot(q, async querySnapshot => {
+      for (let i = 0; i < querySnapshot.docs.length; i++) {
+        const doc = querySnapshot.docs[i];
+        const relationQ = query(
+          collection(db, 'Relations'),
+          where('user1', '==', doc.id),
+        );
+      }
+
       setUsers(
         querySnapshot.docs.map(doc => ({
           id: doc.id,
