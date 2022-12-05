@@ -1,12 +1,27 @@
 import React, {useState} from 'react';
-import {View} from 'react-native-ui-lib';
+import {View, Text} from 'react-native-ui-lib';
 import {StyleSheet} from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
 
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
+const CELL_COUNT = 6;
+
 const ConfirmCode = ({navigation}: any) => {
+  const [value, setValue] = useState('');
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
+  });
+
   return (
     <Container bottom centerH>
       <IconButton
@@ -19,7 +34,7 @@ const ConfirmCode = ({navigation}: any) => {
       <CustomText marginB-30 style={styles.confirmLabel}>
         認証コード
       </CustomText>
-      <View row>
+      {/* <View row>
         <TextInput
           underlineColor={Colors.white}
           activeUnderlineColor={Colors.white}
@@ -55,11 +70,35 @@ const ConfirmCode = ({navigation}: any) => {
           activeUnderlineColor={Colors.white}
           style={{...styles.letter}}
           theme={{colors: {text: Colors.white}}}
+        />
+      </View> */}
+      <View>
+        <CodeField
+          ref={ref}
+          {...props}
+          // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
+          value={value}
+          onChangeText={setValue}
+          cellCount={CELL_COUNT}
+          rootStyle={styles.codeFieldRoot}
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          renderCell={({index, symbol, isFocused}) => (
+            <Text
+              key={index}
+              style={[styles.cell, isFocused && styles.focusCell]}
+              onLayout={getCellOnLayoutHandler(index)}
+            >
+              {symbol || (isFocused ? <Cursor /> : null)}
+            </Text>
+          )}
         />
       </View>
       <CustomButton
         label="次へ"
-        onPress={() => navigation.navigate('NameInput')}
+        onPress={() => {
+          // navigation.navigate('NameInput')
+        }}
       />
       <CustomText marginB-40 marginT-10>
         認証コードの再送信をリクエストする
@@ -85,6 +124,27 @@ const styles = StyleSheet.create({
     marginBottom: 50,
     backgroundColor: 'transparent',
     textAlign: 'center',
+  },
+  codeFieldRoot: {
+    marginTop: 20,
+    width: '80%',
+    marginBottom: 20,
+    marginLeft: 15,
+  },
+  cell: {
+    width: 40,
+    height: 40,
+    lineHeight: 38,
+    fontSize: 24,
+    borderWidth: 2,
+    borderColor: '#ffffff77',
+    borderRadius: 3,
+    textAlign: 'center',
+    backgroundColor: '#ffffff66',
+    color: Colors.white,
+  },
+  focusCell: {
+    borderColor: '#ffffff',
   },
 });
 
