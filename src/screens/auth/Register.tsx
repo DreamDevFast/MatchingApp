@@ -31,10 +31,14 @@ const Register = ({navigation}: any) => {
         [loginMethod]: loginMethod === 'email' ? email : mobile,
       }),
     );
-    let code = '123456',
+    let code = '',
       confirmation = null;
     if (loginMethod === 'email') {
       try {
+        for (let i = 0; i < 6; i++) {
+          let each = Math.floor(Math.random() * 10) % 10;
+          code += `${each}`;
+        }
         const res = await axios.get(
           emailConfirmCodeBaseURL + `?dest=${email}&code=${code}`,
         );

@@ -30,6 +30,7 @@ const ConfirmCode = ({navigation, route}: any) => {
   const handleConfirm = async () => {
     if (loginMethod === 'email') {
       if (code === value) {
+        setError('');
         navigation.navigate('NameInput');
       } else {
         setError('確認コードが正しくありません');
@@ -40,11 +41,13 @@ const ConfirmCode = ({navigation, route}: any) => {
           confirmation.verificationId,
           value,
         );
+        setError('');
         navigation.navigate('NameInput');
       } catch (err) {
         let error: any = err;
         if (error.code == 'auth/invalid-verification-code') {
           console.log('Invalid code.');
+          setError('確認コードが正しくありません');
         }
       }
     }
@@ -123,7 +126,7 @@ const ConfirmCode = ({navigation, route}: any) => {
       </View>
       {error ? (
         <View>
-          <Text>{error}</Text>
+          <Text style={styles.error}>{error}</Text>
         </View>
       ) : (
         <></>
@@ -175,6 +178,9 @@ const styles = StyleSheet.create({
   },
   focusCell: {
     borderColor: '#ffffff',
+  },
+  error: {
+    color: Colors.red1,
   },
 });
 
