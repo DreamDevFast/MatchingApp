@@ -8,20 +8,47 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+import auth from '@react-native-firebase/auth';
 
+import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
 const CELL_COUNT = 6;
 
-const ConfirmCode = ({navigation}: any) => {
+const ConfirmCode = ({navigation, route}: any) => {
+  const {code, confirmation} = route.params;
+  const loginMethod = useAppSelector((state: any) => state.global.loginMethod);
   const [value, setValue] = useState('');
+  const [error, setError] = useState('');
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
   });
 
+  const handleConfirm = async () => {
+    if (loginMethod === 'email') {
+      if (code === value) {
+        navigation.navigate('NameInput');
+      } else {
+        setError('確認コードが正しくありません');
+      }
+    } else if (loginMethod === 'mobile') {
+      try {
+        const credential = auth.PhoneAuthProvider.credential(
+          confirmation.verificationId,
+          value,
+        );
+        navigation.navigate('NameInput');
+      } catch (err) {
+        let error: any = err;
+        if (error.code == 'auth/invalid-verification-code') {
+          console.log('Invalid code.');
+        }
+      }
+    }
+  };
   return (
     <Container bottom centerH>
       <IconButton
@@ -94,12 +121,15 @@ const ConfirmCode = ({navigation}: any) => {
           )}
         />
       </View>
-      <CustomButton
-        label="次へ"
-        onPress={() => {
-          // navigation.navigate('NameInput')
-        }}
-      />
+      {error ? (
+        <View>
+          <Text>{error}</Text>
+        </View>
+      ) : (
+        <></>
+      )}
+
+      <CustomButton label="次へ" onPress={handleConfirm} />
       <CustomText marginB-40 marginT-10>
         認証コードの再送信をリクエストする
       </CustomText>

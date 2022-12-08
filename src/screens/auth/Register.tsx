@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {IconButton, TextInput} from 'react-native-paper';
 import {StyleSheet, TouchableHighlight} from 'react-native';
 import {View} from 'react-native-ui-lib';
+import auth from '@react-native-firebase/auth';
 // import RNSmtpMailer from 'react-native-smtp-mailer';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
@@ -9,6 +10,10 @@ import {setLoginMethod, setTempUser} from '../../redux/features/globalSlice';
 
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
+import axios from 'axios';
+
+var emailConfirmCodeBaseURL =
+  'https://us-central1-okyuin-akiba.cloudfunctions.net/sendMail';
 
 const Register = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
@@ -19,34 +24,39 @@ const Register = ({navigation}: any) => {
   const [email, setEmail] = useState<string>(tempUser.email);
   const [mobile, setMobile] = useState<string>(tempUser.mobile);
 
-  const handleToConfirmCode = () => {
+  const handleToConfirmCode = async () => {
     dispatch(
       setTempUser({
         ...tempUser,
         [loginMethod]: loginMethod === 'email' ? email : mobile,
       }),
     );
-
+    let code = '123456',
+      confirmation = null;
     if (loginMethod === 'email') {
-      // RNSmtpMailer.sendMail({
-      //   mailhost: 'xs057239.xsrv.jp',
-      //   port: '587',
-      //   ssl: true, // optional. if false, then TLS is enabled. Its true by default in android. In iOS TLS/SSL is determined automatically, and this field doesn't affect anything
-      //   username: 'info@xs057239.xsrv.jp',
-      //   password: 'lifepd057',
-      //   fromName: 'MatchingApp', // optional
-      //   replyTo: 'info@xs057239.xsrv.jp', // optional
-      //   recipients: 'sujanesh@chainfuse.io',
-      //   subject: 'subject',
-      //   htmlBody: '<h1>header</h1><p>body</p>',
-      //   attachmentPaths: [], // optional
-      //   attachmentNames: [], // required in android, these are renames of original files. in ios filenames will be same as specified in path. In a ios-only application, no need to define it
-      // })
-      //   .then(success => console.log(success))
-      //   .catch(err => console.log(err));
+      try {
+        const res = await axios.get(
+          emailConfirmCodeBaseURL + `?dest=${email}&code=${code}`,
+        );
+        console.log(res);
+        if (res.data === 'Sended') {
+          return navigation.navigate('ConfirmCode', {code, confirmation});
+        }
+      } catch (err) {
+        console.log(err);
+      }
     } else if (loginMethod === 'mobile') {
+      try {
+        confirmation = await auth().verifyPhoneNumber(mobile);
+        console.log('confirm finished');
+        if (confirmation) {
+          console.log(confirmation);
+          return navigation.navigate('ConfirmCode', {confirmation, code});
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
-    navigation.navigate('ConfirmCode');
   };
 
   return (
