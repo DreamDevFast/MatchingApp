@@ -11,7 +11,7 @@ let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'dream.dev1215@gmail.com',
-    pass: 'mhfhhfzggqkfbsys',
+    pass: 'qapvozeqidrnescw',
   },
 });
 // // Create and deploy your first functions
@@ -23,11 +23,11 @@ exports.sendMail = functions.https.onRequest((req, res) => {
     const dest = req.query.dest;
     const code = req.query.code;
     const data =
-      'アカウント登録のリクエストを受け付けました。<br>アカウント登録を完了するには、アプリ内で次の認証コードをご入力ください。<br>' +
+      '<html><body>アカウント登録のリクエストを受け付けました。<br>アカウント登録を完了するには、アプリ内で次の認証コードをご入力ください。<br>' +
       code +
       '<br><br>======================        ' +
       '<br>※本メールは送信専用アドレスから配信しています。本メールに直接返信いただいても回答できませんのでご注意ください。' +
-      '<br>======================';
+      '<br>======================</body><html>';
 
     const mailOptions = {
       from: 'Okyuin <dream.dev1215@gmail.com>', // Something like: Jane Doe <janedoe@gmail.com>

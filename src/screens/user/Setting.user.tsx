@@ -6,6 +6,7 @@ import firestore from '@react-native-firebase/firestore';
 
 import {Container, CustomButton, CustomText} from '../../components';
 import {Colors} from '../../styles';
+import {Dropdown} from 'react-native-element-dropdown';
 import {TextInput, Switch, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 
@@ -16,6 +17,7 @@ import {
   Range,
   setPriceRange,
 } from '../../redux/features/settingSlice';
+import {pref_city} from '../../constants/config';
 
 import Thumb from '../../components/Thumb';
 import Rail from '../../components/Rail';
@@ -276,7 +278,9 @@ const UserSetting = ({navigation}: any) => {
                 activeUnderlineColor={'#ffffff'}
                 theme={{colors: {text: Colors.dark}}}
                 value={mobile}
-                onChangeText={handleUserInfo('mobile')}
+                onChangeText={text =>
+                  handleUserInfo('mobile')(text.replace(/[^0-9]/g, ''))
+                }
               />
             </View>
             <View row spread centerV style={styles.part} marginB-10>
@@ -295,14 +299,25 @@ const UserSetting = ({navigation}: any) => {
             {tempUser.role === 'girl' ? (
               <View row spread centerV style={styles.part} marginB-10>
                 <Text style={styles.partLabel}>希望エリア</Text>
-                <TextInput
-                  style={styles.input}
-                  selectionColor={Colors.black}
-                  underlineColor={'#ffffff'}
-                  activeUnderlineColor={'#ffffff'}
-                  theme={{colors: {text: Colors.dark}}}
+                <Dropdown
+                  style={styles.dropdown}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  data={pref_city.map(item => ({
+                    label: item.pref,
+                    value: item.id,
+                  }))}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={''}
+                  searchPlaceholder={''}
+                  onChange={(item: any) =>
+                    handleSettingValue('searchLocation')(item.value)
+                  }
                   value={searchLocation}
-                  onChangeText={handleSettingValue('searchLocation')}
                 />
               </View>
             ) : (
@@ -376,16 +391,13 @@ const UserSetting = ({navigation}: any) => {
           </View>
           <View style={styles.block} marginT-10>
             <Text color={Colors.subLabel}>お問い合わせ</Text>
-            <View row spread centerV style={styles.part} marginB-10 marginT-10>
-              <Text style={styles.partLabel}>ヘルプとお問い合わせ</Text>
-              <TextInput
-                style={{...styles.input, width: '40%'}}
-                selectionColor={Colors.black}
-                underlineColor={'#ffffff'}
-                activeUnderlineColor={'#ffffff'}
-                theme={{colors: {text: Colors.dark}}}
-              />
-            </View>
+            <CustomButton
+              label="ヘルプとお問い合わせ"
+              color={Colors.white}
+              labelStyle={styles.help}
+              style={styles.logout}
+              onPress={() => navigation.navigate('Help')}
+            />
           </View>
           <View style={styles.block} marginT-10 marginB-10>
             <CustomButton
@@ -448,5 +460,30 @@ const styles = StyleSheet.create({
   slider: {
     width: '90%',
   },
+  help: {
+    color: Colors.iconLabel,
+  },
+  dropdown: {
+    height: 30,
+    paddingLeft: 12,
+    paddingRight: 12,
+    width: '80%',
+    marginTop: 10,
+    marginBottom: 10,
+    borderBottomColor: 'transparent',
+    borderBottomWidth: 1,
+  },
+  inputSearchStyle: {
+    height: 40,
+    color: Colors.white,
+  },
+  selectedTextStyle: {
+    color: Colors.black,
+    textAlign: 'right',
+  },
+  placeholderStyle: {
+    color: Colors.white,
+  },
 });
+
 export default UserSetting;

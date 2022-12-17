@@ -39,6 +39,7 @@ const UserProfile = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
   const setting = useAppSelector((state: any) => state.setting);
 
+  const users = firestore().collection('Users');
   const profiles = firestore().collection('Profiles');
 
   const [profile, setProfile] = useState<Profile>({
@@ -195,7 +196,19 @@ const UserProfile = ({navigation}: any) => {
     });
   };
 
+  const handleName = (name: string) => {
+    dispatch(
+      setTempUser({
+        ...tempUser,
+        name,
+      }),
+    );
+  };
+
   const handleBack = async () => {
+    await users.doc(tempUser.id).update({
+      name: tempUser.name,
+    });
     if (profile.id === undefined) {
       try {
         await profiles.doc(tempUser.id).set({
@@ -228,9 +241,17 @@ const UserProfile = ({navigation}: any) => {
             style={styles.image}
           />
           <View style={styles.firstBlock}>
-            <Text color={Colors.black} style={styles.title}>
+            {/* <Text color={Colors.black} style={styles.title}>
               {tempUser.name}
-            </Text>
+            </Text> */}
+            <TextInput
+              selectionColor={Colors.iconLabel}
+              underlineColor={Colors.white}
+              activeUnderlineColor={Colors.white}
+              style={styles.name_input}
+              onChangeText={handleName}
+              value={tempUser.name}
+            />
             <View row spread>
               <SimpleLineIcons
                 name="location-pin"
@@ -358,6 +379,12 @@ const styles = StyleSheet.create({
   },
   bio_input: {
     backgroundColor: 'transparent',
+  },
+  name_input: {
+    height: 50,
+    fontSize: 30,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 0,
   },
 });
 export default UserProfile;

@@ -185,6 +185,7 @@ const UserShopSearch = ({navigation, route}: any) => {
                     keyword,
                     priceRange: myPriceRange,
                   } = data;
+                  console.log(searchLocation, keyword, priceRange);
                   if (
                     searchLocation &&
                     searchLocation !== doc.data().prefecture
@@ -214,12 +215,12 @@ const UserShopSearch = ({navigation, route}: any) => {
                   continue;
                 const birthday = new Date(doc.data().birthday.seconds * 1000);
                 const age = new Date().getFullYear() - birthday.getFullYear();
-                console.log(age);
+                console.log('age', age);
                 if (age < ageRange.low || age > ageRange.high) continue;
               }
             }
             // filtered by setting
-
+            console.log('passed');
             const matchedPrefs = pref_city.filter(
               each => each.id === doc.data().prefecture,
             );

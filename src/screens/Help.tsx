@@ -1,11 +1,13 @@
 import React from 'react';
 import {View, Text} from 'react-native-ui-lib';
+import {Container, CustomText} from '../components';
 
 const Help = () => {
   return (
-    <View>
+    <Container>
+      <View marginT-30></View>
       <Text>Help</Text>
-    </View>
+    </Container>
   );
 };
 

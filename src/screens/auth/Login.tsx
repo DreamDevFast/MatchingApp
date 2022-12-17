@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {StyleSheet, TouchableHighlight} from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
-import {View} from 'react-native-ui-lib';
+import {View, Text} from 'react-native-ui-lib';
 
 import firestore from '@react-native-firebase/firestore';
 
@@ -21,9 +22,25 @@ const Login = ({navigation}: any) => {
 
   const [email, setEmail] = useState<string>('');
   const [mobile, setMobile] = useState<string>('');
+  const [error, setError] = useState('');
+
+  useFocusEffect(
+    useCallback(() => {
+      return setError('');
+    }, []),
+  );
 
   const handleLogin = () => {
     const operator = loginMethod === 'email' ? email : mobile;
+    if (operator === '') {
+      return setError(
+        loginMethod === 'email'
+          ? 'メールアドレスが入力されていません。'
+          : '電話番号を入力されていませんに変更してください。',
+      );
+    } else {
+      setError('');
+    }
     firestore()
       .collection('Users')
       .where(loginMethod, '==', operator)
@@ -98,9 +115,16 @@ const Login = ({navigation}: any) => {
             value={email}
             onChangeText={text => setEmail(text)}
           />
+          {error ? (
+            <View>
+              <Text style={styles.error}>{error}</Text>
+            </View>
+          ) : (
+            <></>
+          )}
           <CustomButton label="次へ" onPress={handleLogin} />
           <View marginT-10></View>
-          <TouchableHighlight
+          {/* <TouchableHighlight
             onPress={() => {
               dispatch(
                 setTempUser({
@@ -119,9 +143,12 @@ const Login = ({navigation}: any) => {
             }}
           >
             <CustomText>新規会員登録</CustomText>
-          </TouchableHighlight>
+          </TouchableHighlight> */}
           <TouchableHighlight
-            onPress={() => dispatch(setLoginMethod('mobile'))}
+            onPress={() => {
+              setError('');
+              dispatch(setLoginMethod('mobile'));
+            }}
           >
             <CustomText>電話番号でログイン</CustomText>
           </TouchableHighlight>
@@ -144,12 +171,19 @@ const Login = ({navigation}: any) => {
               style={{...styles.phoneNumberInput}}
               theme={{colors: {text: Colors.white}}}
               value={mobile}
-              onChangeText={text => setMobile(text)}
+              onChangeText={text => setMobile(text.replace(/[^0-9]/g, ''))}
             />
           </View>
+          {error ? (
+            <View>
+              <Text style={styles.error}>{error}</Text>
+            </View>
+          ) : (
+            <></>
+          )}
           <CustomButton label="次へ" onPress={handleLogin} />
           <View marginT-10></View>
-          <TouchableHighlight
+          {/* <TouchableHighlight
             onPress={() => {
               dispatch(
                 setTempUser({
@@ -168,8 +202,13 @@ const Login = ({navigation}: any) => {
             }}
           >
             <CustomText>新規会員登録</CustomText>
-          </TouchableHighlight>
-          <TouchableHighlight onPress={() => dispatch(setLoginMethod('email'))}>
+          </TouchableHighlight> */}
+          <TouchableHighlight
+            onPress={() => {
+              setError('');
+              dispatch(setLoginMethod('email'));
+            }}
+          >
             <CustomText>メールアドレスでログイン</CustomText>
           </TouchableHighlight>
           <View marginB-40></View>
@@ -203,6 +242,9 @@ const styles = StyleSheet.create({
     marginLeft: '3%',
     marginBottom: 50,
     backgroundColor: 'transparent',
+  },
+  error: {
+    color: Colors.red1,
   },
 });
 
