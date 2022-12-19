@@ -40,7 +40,7 @@ const AppNavigator = () => {
           component={PhoneVerification}
         /> */}
         {/* <Stack.Screen name="AnimationTest" component={AnimationTest} /> */}
-        {/* <Stack.Screen name="NotificationTest" component={NotificationTest} /> */}
+        <Stack.Screen name="NotificationTest" component={NotificationTest} />
         <Stack.Screen name="Home" component={FirstScreen} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
