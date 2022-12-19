@@ -1,6 +1,6 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {Appbar, TextInput} from 'react-native-paper';
-import {StyleSheet, Dimensions, Platform} from 'react-native';
+import {StyleSheet, Dimensions, Platform, Alert} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {View, Spacings, Avatar, Text} from 'react-native-ui-lib';
 // import InfiniteScroll from 'react-native-infinite-scroll';
@@ -20,6 +20,7 @@ import {
 } from 'react-native-gifted-chat';
 
 import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 
@@ -39,12 +40,15 @@ export default function UserChatRoom({route, navigation}: any) {
   const [isLoadingEarlier, setIsLoadingEarlier] = useState<boolean>(false);
   const [loadEarlier, setEarlier] = useState<boolean>(true);
 
-  const {id, name, avatar} = route.params;
+  const {id, name, avatar, sendable} = route.params;
   const chatmessages = firestore().collection('ChatMessages');
 
   useFocusEffect(
     useCallback(() => {
       console.log(_isMounted);
+      messaging().onMessage(message => {
+        console.log('A new message is received', message);
+      });
       const subscriber = chatmessages.onSnapshot(querySnapshot => {
         console.log('snapshot');
         if (querySnapshot && _isMounted) {
@@ -138,12 +142,16 @@ export default function UserChatRoom({route, navigation}: any) {
   };
 
   const onSend = useCallback((messages: Array<any> = []) => {
-    chatmessages.add({
-      sender: tempUser.id,
-      text: messages[0].text,
-      createdAt: new Date(),
-      receiver: id,
-    });
+    if (sendable) {
+      chatmessages.add({
+        sender: tempUser.id,
+        text: messages[0].text,
+        createdAt: new Date(),
+        receiver: id,
+      });
+    } else {
+      Alert.alert(`Can't send message to the user ${name}`);
+    }
   }, []);
 
   const onLoadEarlier = () => {

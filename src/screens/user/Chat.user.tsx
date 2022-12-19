@@ -66,6 +66,7 @@ const UserChat = ({navigation, route}: any) => {
               id: doc.id,
               name: doc.data().name,
               avatar: doc.data().avatar,
+              sendable: !!doc.data().fcmToken,
             })),
           );
 
@@ -116,6 +117,7 @@ const UserChat = ({navigation, route}: any) => {
                 id: user.id,
                 name: user.name,
                 avatar: user.avatar,
+                sendable: user.sendable,
               });
             }}
           />

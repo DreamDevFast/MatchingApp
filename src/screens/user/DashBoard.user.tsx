@@ -372,7 +372,7 @@ const UserDashBoard = ({navigation, route}: any) => {
         users
           .doc(tempUser.id)
           .update({
-            fcmTokens: firestore.FieldValue.arrayUnion(fcmToken),
+            fcmToken,
           })
           .then(() => {
             console.log('FCM token updated!');

@@ -54,14 +54,18 @@ exports.handleMessage = functions.firestore
   .onCreate(async snapshot => {
     // Notification details.
     const receiver_id = snapshot.data().receiver;
+    const sender_id = snapshot.data().sender;
     const text = snapshot.data().text;
     const receiver_data = (
       await admin.firestore().collection('Users').doc(receiver_id).get()
     ).data();
+    const sender_data = (
+      await admin.firestore().collection('Users').doc(sender_id).get()
+    ).data();
 
     const payload = {
       notification: {
-        title: `From ${receiver_data.name}`,
+        title: `From ${receiver_data.name} To ${sender_data.name}`,
         body: text
           ? text.length <= 100
             ? text
@@ -70,9 +74,11 @@ exports.handleMessage = functions.firestore
       },
     };
 
-    if (receiver_data.fcmTokens.length > 0) {
+    if (receiver_data.fcmToken) {
       // Send notifications to all tokens.
-      const response = await admin.messaging().sendToDevice(tokens, payload);
+      const response = await admin
+        .messaging()
+        .sendToDevice([receiver_data.fcmToken], payload);
       functions.logger.log(
         'Notifications have been sent and tokens cleaned up.',
       );
