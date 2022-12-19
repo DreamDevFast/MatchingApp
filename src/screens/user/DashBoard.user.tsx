@@ -6,6 +6,7 @@ import {
   BackHandler,
   Dimensions,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import {IconButton, Modal} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -13,6 +14,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
 
 import {CustomButton, Container, CustomText} from '../../components';
 import {Colors} from '../../styles';
@@ -238,6 +240,8 @@ const UserDashBoard = ({navigation, route}: any) => {
     useCallback(() => {
       console.log(isEntering);
       if (isEntering) {
+        dispatch(setEntering(false));
+        checkToken();
         settings
           .doc(tempUser.id)
           .get()
@@ -360,6 +364,28 @@ const UserDashBoard = ({navigation, route}: any) => {
       }
     }, []),
   );
+
+  const checkToken = () => {
+    messaging()
+      .getToken()
+      .then(fcmToken => {
+        users
+          .doc(tempUser.id)
+          .update({
+            fcmTokens: firestore.FieldValue.arrayUnion(fcmToken),
+          })
+          .then(() => {
+            console.log('FCM token updated!');
+          })
+          .catch(err => {
+            console.log('Error While updating FCM token: ', err);
+          });
+      })
+      .catch(err => {
+        console.log('Error while getting FCM token: ', err);
+        Alert.alert('');
+      });
+  };
 
   const changeCheckState = (user: any) => {
     console.log(user.id);
