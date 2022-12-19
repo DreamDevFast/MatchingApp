@@ -48,3 +48,32 @@ exports.sendMail = functions.https.onRequest((req, res) => {
     });
   });
 });
+
+exports.handleMessage = functions.https.onRequest(async (req, res) => {
+  try {
+    await admin.messaging().sendToDevice(
+      [
+        'cXPViS7xTLG0lxTB9gdZHj:APA91bGjbzw8eqO0DQVMTRKbhNjSjtCVpvqnzx2nz9MTXMZJKhOuDwbzH6QAq8s4seorgpZqQRG-wSNsuFFuoAe0PPKKZhDMSfBG6lWEUXOkQTvnGZGFzD9ZpFylKEFm4c5IjbWZ3GzM',
+      ],
+      {
+        notification: {
+          title: 'Hey, Everybody!',
+          body: 'This is the first message from cloud functions',
+        },
+        data: {
+          user: 'me',
+        },
+      },
+      {
+        // Required for background/quit data-only messages on iOS
+        contentAvailable: true,
+        // Required for background/quit data-only messages on Android
+        priority: 'high',
+      },
+    );
+
+    res.json({message: 'Success'});
+  } catch (err) {
+    res.status(500).json({message: err});
+  }
+});
