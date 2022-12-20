@@ -23,6 +23,7 @@ import firestore from '@react-native-firebase/firestore';
 import messaging from '@react-native-firebase/messaging';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
+import {setTempUser, setLoading} from '../../redux/features/globalSlice';
 
 import {Container} from '../../components';
 import {Colors} from '../../styles';
@@ -34,6 +35,7 @@ var _isMounted = false;
 var numberOfMessages = 0;
 
 export default function UserChatRoom({route, navigation}: any) {
+  const dispatch = useAppDispatch();
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
 
   const [messages, setMessages] = useState<any>([]);
@@ -46,12 +48,16 @@ export default function UserChatRoom({route, navigation}: any) {
   useFocusEffect(
     useCallback(() => {
       console.log(_isMounted);
-      const unsubscribter = messaging().onMessage(message => {
+      messaging().setBackgroundMessageHandler(async message => {
+        console.log('Background handler is here', message);
+      });
+      const unsubscriber = messaging().onMessage(message => {
         console.log('A new message is received', message);
       });
       const subscriber = chatmessages.onSnapshot(querySnapshot => {
-        console.log('snapshot');
+        console.log('snapshot', _isMounted);
         if (querySnapshot && _isMounted) {
+          console.log('snapshot entered');
           const docs = querySnapshot.docs.filter(
             doc =>
               (doc.data().sender === tempUser.id &&
@@ -119,7 +125,7 @@ export default function UserChatRoom({route, navigation}: any) {
 
       return () => {
         subscriber();
-        unsubscribter();
+        unsubscriber();
         _isMounted = false;
         numberOfMessages = 0;
       };
@@ -215,7 +221,10 @@ export default function UserChatRoom({route, navigation}: any) {
       >
         <Appbar.Action
           icon={'chevron-left'}
-          onPress={() => navigation.navigate('UserChat')}
+          onPress={() => {
+            dispatch(setLoading(true));
+            navigation.navigate('UserChat');
+          }}
           color={Colors.white}
         />
         <Appbar.Content
