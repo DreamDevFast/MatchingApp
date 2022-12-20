@@ -16,10 +16,17 @@ import firestore from '@react-native-firebase/firestore';
 
 import {Container, CustomButton} from '../../components';
 import {Colors} from '../../styles';
+import CustomIconButton from '../../components/CustomIconButton';
 
 const defaultImage = require('../../assets/images/empty.jpg');
 
 const {width, height} = Dimensions.get('window');
+
+const refreshIcon = require('../../assets/icons/refresh-main.png');
+const likeIcon = require('../../assets/icons/like-main.png');
+const dislikeIcon = require('../../assets/icons/dislike-main.png');
+const favoriteIcon = require('../../assets/icons/favorite-main.png');
+const boostIcon = require('../../assets/icons/boost-main.png');
 
 const UserShopDetail = ({navigation, route}: any) => {
   const {id, avatar, name, high, low} = route.params;
@@ -81,39 +88,64 @@ const UserShopDetail = ({navigation, route}: any) => {
           <Divider style={styles.divider} />
           <Text color={Colors.white}>{profile.bio}</Text>
           <View row centerH centerV spread>
-            <IconButton
+            {/* <IconButton
               icon="undo"
               color={Colors.white}
               style={styles.return}
               size={15}
               onPress={() => console.log('Pressed')}
+            /> */}
+            <CustomIconButton
+              imageSource={refreshIcon}
+              size={40}
+              onPress={() => console.log('Pressed')}
             />
-            <IconButton
+            {/* <IconButton
               icon="times"
               color={Colors.white}
               style={styles.dislike}
               size={20}
               onPress={() => console.log('Pressed')}
+            /> */}
+            <CustomIconButton
+              imageSource={dislikeIcon}
+              size={50}
+              onPress={() => console.log('Pressed')}
             />
-            <IconButton
+            {/* <IconButton
               icon="star"
               color={Colors.white}
               style={styles.favorite}
               size={15}
               onPress={() => console.log('Pressed')}
+            /> */}
+            <CustomIconButton
+              imageSource={favoriteIcon}
+              size={40}
+              onPress={() => console.log('Pressed')}
             />
-            <IconButton
+            {/* <IconButton
               icon="heart"
               color={Colors.white}
               style={styles.like}
               size={20}
               onPress={() => console.log('Pressed')}
+            /> */}
+            <CustomIconButton
+              imageSource={likeIcon}
+              size={50}
+              onPress={() => console.log('Pressed')}
             />
-            <IconButton
+            {/* <IconButton
               icon="bolt"
               color={Colors.white}
               style={styles.boost}
               size={15}
+              onPress={() => console.log('Pressed')}
+            /> */}
+            <CustomIconButton
+              imageSource={boostIcon}
+              size={40}
               onPress={() => console.log('Pressed')}
             />
           </View>

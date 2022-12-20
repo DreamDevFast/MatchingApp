@@ -26,8 +26,14 @@ import {Colors} from '../../styles';
 import CustomStamp from '../../components/CustomStamp';
 import Loader from '../../components/Loader';
 import {pref_city} from '../../constants/config';
+import CustomIconButton from '../../components/CustomIconButton';
 
 const defaultImage = require('../../assets/images/empty.jpg');
+const refreshIcon = require('../../assets/icons/refresh-main.png');
+const likeIcon = require('../../assets/icons/like-main.png');
+const dislikeIcon = require('../../assets/icons/dislike-main.png');
+const favoriteIcon = require('../../assets/icons/favorite-main.png');
+const boostIcon = require('../../assets/icons/boost-main.png');
 
 const {width, height} = Dimensions.get('window');
 const threshold = width * 0.1;
@@ -593,42 +599,67 @@ const UserShopSearch = ({navigation, route}: any) => {
           }
         })}
       <View style={styles.return} centerH centerV>
-        <IconButton
-          icon="undo"
+        {/* <IconButton
+          icon={refreshIcon}
           color={Colors.white}
           size={15}
+          onPress={handleRelation(Relation.like)}
+        /> */}
+        <CustomIconButton
+          imageSource={refreshIcon}
+          size={40}
           onPress={handleRelation(Relation.like)}
         />
       </View>
       <View style={styles.dislike} centerH centerV>
-        <IconButton
-          icon="times"
+        {/* <IconButton
+          icon={dislikeIcon}
           color={Colors.white}
           size={20}
+          onPress={handleRelation(Relation.dislike)}
+        /> */}
+        <CustomIconButton
+          imageSource={dislikeIcon}
+          size={50}
           onPress={handleRelation(Relation.dislike)}
         />
       </View>
       <View style={styles.favorite} centerH centerV>
-        <IconButton
-          icon="star"
+        {/* <IconButton
+          icon={favoriteIcon}
           color={Colors.white}
           size={15}
+          onPress={handleRelation(Relation.favorite)}
+        /> */}
+        <CustomIconButton
+          imageSource={favoriteIcon}
+          size={40}
           onPress={handleRelation(Relation.favorite)}
         />
       </View>
       <View style={styles.like} centerH centerV>
-        <IconButton
-          icon="heart"
+        {/* <IconButton
+          icon={{uri: likeIcon}}
           color={Colors.white}
           size={20}
+          onPress={handleRelation(Relation.like)}
+        /> */}
+        <CustomIconButton
+          imageSource={likeIcon}
+          size={50}
           onPress={handleRelation(Relation.like)}
         />
       </View>
       <View style={styles.boost} centerH centerV>
-        <IconButton
-          icon="bolt"
+        {/* <IconButton
+          icon={{uri: boostIcon}}
           color={Colors.white}
           size={15}
+          onPress={handleRelation(Relation.like)}
+        /> */}
+        <CustomIconButton
+          imageSource={boostIcon}
+          size={40}
           onPress={handleRelation(Relation.like)}
         />
       </View>

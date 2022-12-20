@@ -46,7 +46,7 @@ export default function UserChatRoom({route, navigation}: any) {
   useFocusEffect(
     useCallback(() => {
       console.log(_isMounted);
-      messaging().onMessage(message => {
+      const unsubscribter = messaging().onMessage(message => {
         console.log('A new message is received', message);
       });
       const subscriber = chatmessages.onSnapshot(querySnapshot => {
@@ -59,6 +59,8 @@ export default function UserChatRoom({route, navigation}: any) {
               (doc.data().sender === id && doc.data().receiver === tempUser.id),
           );
           docs.sort((a, b) => b.data().createdAt - a.data().createdAt);
+          console.log('snapshot docs: ', docs[0]);
+
           if (docs.length) {
             const msgs = [
               {
@@ -117,6 +119,7 @@ export default function UserChatRoom({route, navigation}: any) {
 
       return () => {
         subscriber();
+        unsubscribter();
         _isMounted = false;
         numberOfMessages = 0;
       };
