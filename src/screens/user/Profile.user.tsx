@@ -26,6 +26,8 @@ import {Container, CustomButton} from '../../components';
 import {Colors} from '../../styles';
 import Portfolio from '../../components/Portfolio';
 
+const userIcon = require('../../assets/images/user.png');
+
 const {width, height} = Dimensions.get('window');
 
 type Profile = {
@@ -235,9 +237,11 @@ const UserProfile = ({navigation}: any) => {
       <ScrollView>
         <Container>
           <ImageBackground
-            source={{
-              uri: tempUser.avatar,
-            }}
+            source={
+              tempUser.avatar === 'default.png' || '' || undefined
+                ? userIcon
+                : {uri: tempUser.avatar}
+            }
             style={styles.image}
           />
           <View style={styles.firstBlock}>
