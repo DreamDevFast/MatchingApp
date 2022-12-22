@@ -6,6 +6,11 @@ import {View} from 'react-native-ui-lib';
 import {Colors} from '../styles';
 import {useAppDispatch} from '../redux/reduxHooks';
 import {setLoading} from '../redux/features/globalSlice';
+import CustomIconButton from './CustomIconButton';
+
+const likeIcon = require('../assets/icons/like-main.png');
+const dislikeIcon = require('../assets/icons/dislike-main.png');
+const favoriteIcon = require('../assets/icons/favorite-main.png');
 
 const {width, height} = Dimensions.get('window');
 
@@ -81,26 +86,41 @@ const CustomTabnav = ({children, navigation, route, ...props}: any) => {
             {open ? (
               <View style={styles.dropdown}>
                 <View marginT-10 style={styles.dislike}>
-                  <IconButton
+                  <CustomIconButton
+                    imageSource={dislikeIcon}
+                    size={50}
+                    onPress={handleDropdownItem(Relation.dislike)}
+                  />
+                  {/* <IconButton
                     icon="times"
                     color={Colors.white}
                     size={25}
                     onPress={handleDropdownItem(Relation.dislike)}
-                  />
+                  /> */}
                 </View>
                 <View marginT-10 style={styles.favorite}>
-                  <IconButton
+                  {/* <IconButton
                     icon="star"
                     color={Colors.white}
                     size={25}
                     onPress={handleDropdownItem(Relation.favorite)}
+                  /> */}
+                  <CustomIconButton
+                    imageSource={favoriteIcon}
+                    size={50}
+                    onPress={handleDropdownItem(Relation.favorite)}
                   />
                 </View>
                 <View marginT-10 style={styles.like}>
-                  <IconButton
+                  {/* <IconButton
                     icon="heart"
                     color={Colors.white}
                     size={25}
+                    onPress={handleDropdownItem(Relation.like)}
+                  /> */}
+                  <CustomIconButton
+                    imageSource={likeIcon}
+                    size={50}
                     onPress={handleDropdownItem(Relation.like)}
                   />
                 </View>
