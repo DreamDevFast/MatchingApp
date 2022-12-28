@@ -161,9 +161,9 @@ const UserShopSearch = ({navigation, route}: any) => {
           console.log(querySnapshot.docs.length);
           if (querySnapshot.docs.length === 0) return;
           querySnapshot.docs.sort((docA: any, docB: any) => {
-            if (docA.data().boosted_date !== undefined) {
+            if (docA.data().boostedAt !== undefined) {
               if (
-                Date.now() - docA.data().boosted_date.seconds * 1000 <
+                Date.now() - docA.data().boostedAt.seconds * 1000 <
                 30 * 60 * 1000
               ) {
                 return -1;
@@ -555,6 +555,12 @@ const UserShopSearch = ({navigation, route}: any) => {
     }
   };
 
+  const boost = () => {
+    users.doc(tempUser.id).update({
+      boostedAt: new Date(),
+    });
+  };
+
   // console.log(targetUsers_alt);
   return (
     <CustomTabnav
@@ -808,11 +814,7 @@ const UserShopSearch = ({navigation, route}: any) => {
           size={15}
           onPress={handleRelation(Relation.like)}
         /> */}
-        <CustomIconButton
-          imageSource={boostIcon}
-          size={40}
-          onPress={handleRelation(Relation.like)}
-        />
+        <CustomIconButton imageSource={boostIcon} size={40} onPress={boost} />
       </View>
     </CustomTabnav>
   );
