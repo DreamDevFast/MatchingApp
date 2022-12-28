@@ -159,8 +159,58 @@ const UserShopSearch = ({navigation, route}: any) => {
           const mySetting = await settings.doc(tempUser.id).get();
           const users = [];
           console.log(querySnapshot.docs.length);
+          if (querySnapshot.docs.length === 0) return;
+          querySnapshot.docs.sort((docA: any, docB: any) => {
+            if (docA.data().boosted_date !== undefined) {
+              if (
+                Date.now() - docA.data().boosted_date.seconds * 1000 <
+                30 * 60 * 1000
+              ) {
+                return -1;
+              }
+            }
+            return 1;
+          });
+          console.log('Here A area is reached');
+
+          let myReactedRelations = [];
+          let reactedRelations1 = await relations
+            .where('user1', '==', tempUser.id)
+            .where('relation1', '!=', Relation.initial)
+            .get();
+          console.log(reactedRelations1.size);
+
+          let reactedRelations2 = await relations
+            .where('user2', '==', tempUser.id)
+            .where('relation2', '!=', Relation.initial)
+            .get();
+
+          if (reactedRelations1.size) {
+            myReactedRelations.push(...reactedRelations1.docs);
+          }
+
+          if (reactedRelations2.size) {
+            myReactedRelations.push(...reactedRelations2.docs);
+          }
+
+          console.log('Here is reached');
+
           for (let i = 0; i < querySnapshot.docs.length; i++) {
-            const doc = querySnapshot.docs[i];
+            let doc = querySnapshot.docs[i];
+
+            if (
+              myReactedRelations.findIndex(relation => {
+                if (
+                  relation.data().user1 === doc.id ||
+                  relation.data().user2 === doc.id
+                ) {
+                  return true;
+                }
+                return false;
+              }) !== -1
+            )
+              continue;
+
             const profile = await profiles.doc(doc.id).get();
             const setting = await settings.doc(doc.id).get();
 
@@ -243,11 +293,112 @@ const UserShopSearch = ({navigation, route}: any) => {
               low: priceRange.low,
               hight: priceRange.high,
             });
+
+            if (users.length === 10) break;
           }
+
           console.log(users);
           setTargetUsers(users);
           dispatch(setLoading(false));
-        });
+        })
+        .catch(err => console.log(err));
+
+      // users
+      //   .where('role', '!=', tempUser.role)
+      //   .get()
+      //   .then(async querySnapshot => {
+      //     const mySetting = await settings.doc(tempUser.id).get();
+      //     const users = [];
+      //     console.log(querySnapshot.docs.length);
+      //     for (let i = 0; i < querySnapshot.docs.length; i++) {
+      //       const doc = querySnapshot.docs[i];
+      //       const profile = await profiles.doc(doc.id).get();
+      //       const setting = await settings.doc(doc.id).get();
+
+      //       let bio = '',
+      //         priceRange = {low: 1500, high: 10000};
+
+      //       if (profile.exists) {
+      //         let data = profile.data();
+      //         if (data !== undefined) {
+      //           bio = data.bio;
+      //         }
+      //       }
+
+      //       if (setting.exists) {
+      //         let data = setting.data();
+      //         if (data !== undefined) {
+      //           priceRange = data.priceRange;
+      //         }
+      //       }
+
+      //       // filter by setting
+      //       if (tempUser.role === 'girl') {
+      //         if (mySetting.exists) {
+      //           const data = mySetting.data();
+      //           if (data) {
+      //             const {
+      //               searchLocation,
+      //               keyword,
+      //               priceRange: myPriceRange,
+      //             } = data;
+      //             console.log(searchLocation, keyword, priceRange);
+      //             if (
+      //               searchLocation &&
+      //               searchLocation !== doc.data().prefecture
+      //             )
+      //               continue;
+      //             if (
+      //               myPriceRange.low > priceRange.high ||
+      //               myPriceRange.high < priceRange.low
+      //             )
+      //               continue;
+      //             if (
+      //               keyword &&
+      //               !doc.data().name.includes(keyword) &&
+      //               !bio.includes(keyword)
+      //             )
+      //               continue;
+      //           }
+      //         }
+      //       } else if (tempUser.role === 'shop') {
+      //         const data = mySetting.data();
+      //         if (data) {
+      //           const {ageRange, priceRange: myPriceRange} = data;
+      //           if (
+      //             myPriceRange.low > priceRange.high ||
+      //             myPriceRange.high < priceRange.low
+      //           )
+      //             continue;
+      //           const birthday = new Date(doc.data().birthday.seconds * 1000);
+      //           const age = new Date().getFullYear() - birthday.getFullYear();
+      //           console.log('age', age);
+      //           if (age < ageRange.low || age > ageRange.high) continue;
+      //         }
+      //       }
+      //       // filtered by setting
+      //       console.log('passed');
+      //       const matchedPrefs = pref_city.filter(
+      //         each => each.id === doc.data().prefecture,
+      //       );
+      //       let prefecture_name = '';
+      //       if (matchedPrefs.length) {
+      //         prefecture_name = matchedPrefs[0].pref;
+      //       }
+      //       users.push({
+      //         id: doc.id,
+      //         name: doc.data().name,
+      //         avatar: doc.data().avatar,
+      //         prefecture_name,
+      //         bio,
+      //         low: priceRange.low,
+      //         hight: priceRange.high,
+      //       });
+      //     }
+      //     console.log(users);
+      //     setTargetUsers(users);
+      //     dispatch(setLoading(false));
+      //   });
 
       return () => {
         index = 0;
