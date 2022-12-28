@@ -45,8 +45,11 @@ enum Relation {
   favorite,
 }
 
+const CYCLE_COUNT = 10;
+
 var index = 0;
 var targetUsers_alt: Array<any>;
+var tempUsers: Array<any>;
 
 const UserShopSearch = ({navigation, route}: any) => {
   const dispatch = useAppDispatch();
@@ -150,8 +153,8 @@ const UserShopSearch = ({navigation, route}: any) => {
     }),
   ).current;
 
-  useFocusEffect(
-    useCallback(() => {
+  const fetchUsers = (count: number) => {
+    return new Promise((resolve, reject) => {
       users
         .where('role', '!=', tempUser.role)
         .get()
@@ -173,7 +176,7 @@ const UserShopSearch = ({navigation, route}: any) => {
           });
           console.log('Here A area is reached');
 
-          let myReactedRelations = [];
+          let myReactedRelations: Array<any> = [];
           let reactedRelations1 = await relations
             .where('user1', '==', tempUser.id)
             .where('relation1', '!=', Relation.initial)
@@ -199,6 +202,7 @@ const UserShopSearch = ({navigation, route}: any) => {
             let doc = querySnapshot.docs[i];
 
             if (
+              myReactedRelations.length &&
               myReactedRelations.findIndex(relation => {
                 if (
                   relation.data().user1 === doc.id ||
@@ -294,9 +298,19 @@ const UserShopSearch = ({navigation, route}: any) => {
               hight: priceRange.high,
             });
 
-            if (users.length === 10) break;
+            if (users.length === count) break;
           }
+          console.log('====Users Length======\n', users.length);
+          resolve(users);
+        })
+        .catch(err => reject(err));
+    });
+  };
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchUsers(CYCLE_COUNT)
+        .then((users: any) => {
           console.log(users);
           setTargetUsers(users);
           dispatch(setLoading(false));
@@ -517,7 +531,7 @@ const UserShopSearch = ({navigation, route}: any) => {
             return false;
           }
         });
-        if (results.length == 1) {
+        if (results.length === 1) {
           const doc = results[0];
           const docId = doc.id;
           const whichRelation =
@@ -547,11 +561,42 @@ const UserShopSearch = ({navigation, route}: any) => {
           }
         }
       });
-    if (index < targetUsers_alt.length) {
-      setCurrentIndex(index);
+    if (targetUsers_alt.length < CYCLE_COUNT) {
+      if (index < targetUsers_alt.length) {
+        setCurrentIndex(index);
+      } else {
+        index = 0;
+        setCurrentIndex(0);
+        // TODO consider if would fetch from database or not
+        setTargetUsers([]);
+      }
     } else {
-      index = 0;
-      setCurrentIndex(0);
+      if (index === CYCLE_COUNT / 2) {
+        fetchUsers(CYCLE_COUNT - 1)
+          .then((users: any) => {
+            console.log('fetched!!!', users.lenght);
+            tempUsers = users;
+          })
+          .catch(err =>
+            console.log(
+              'While fetching user datas in the handleRelation function: ',
+              err,
+            ),
+          );
+      }
+      if (index < targetUsers_alt.length) {
+        if (index === targetUsers_alt.length - 1) {
+          setTargetUsers([targetUsers_alt[index], ...tempUsers]);
+          setCurrentIndex(0);
+          index = 0;
+          tempUsers = [];
+          return;
+        }
+        setCurrentIndex(index);
+      } else {
+        index = 0;
+        setCurrentIndex(0);
+      }
     }
   };
 
