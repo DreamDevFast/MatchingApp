@@ -50,23 +50,24 @@ const Register = ({navigation}: any) => {
       confirmation = null;
     if (loginMethod === 'email') {
       try {
-        if (email) {
-          setError('');
-          dispatch(setLoading(true));
-          for (let i = 0; i < 6; i++) {
-            let each = Math.floor(Math.random() * 10) % 10;
-            code += `${each}`;
-          }
-          const res = await axios.get(
-            emailConfirmCodeBaseURL + `?dest=${email}&code=${code}`,
-          );
-          console.log(res.data);
-          if (res.data === 'Sended') {
-            dispatch(setLoading(false));
-            return navigation.navigate('ConfirmCode', {code, confirmation});
-          }
+        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+        if (reg.test(email) === false) {
+          return setError('入力内容が正しくないのでご確認ください。');
         } else {
-          setError('メールアドレスが入力されていません。');
+          setError('');
+        }
+        dispatch(setLoading(true));
+        for (let i = 0; i < 6; i++) {
+          let each = Math.floor(Math.random() * 10) % 10;
+          code += `${each}`;
+        }
+        const res = await axios.get(
+          emailConfirmCodeBaseURL + `?dest=${email}&code=${code}`,
+        );
+        console.log(res.data);
+        if (res.data === 'Sended') {
+          dispatch(setLoading(false));
+          return navigation.navigate('ConfirmCode', {code, confirmation});
         }
       } catch (err) {
         console.log(err);
@@ -74,18 +75,14 @@ const Register = ({navigation}: any) => {
       }
     } else if (loginMethod === 'mobile') {
       try {
-        if (mobile) {
-          setError('');
-          dispatch(setLoading(true));
-          confirmation = await auth().verifyPhoneNumber(`+81${mobile}`);
-          console.log('confirm finished');
-          if (confirmation) {
-            console.log(confirmation);
-            dispatch(setLoading(false));
-            return navigation.navigate('ConfirmCode', {confirmation, code});
-          }
-        } else {
-          setError('電話番号を入力されていませんに変更してください。');
+        setError('');
+        dispatch(setLoading(true));
+        confirmation = await auth().verifyPhoneNumber(`+81${mobile}`);
+        console.log('confirm finished');
+        if (confirmation) {
+          console.log(confirmation);
+          dispatch(setLoading(false));
+          return navigation.navigate('ConfirmCode', {confirmation, code});
         }
       } catch (err) {
         console.log(err);
@@ -137,7 +134,11 @@ const Register = ({navigation}: any) => {
           ) : (
             <></>
           )}
-          <CustomButton label="はい" onPress={handleToConfirmCode} />
+          <CustomButton
+            label="はい"
+            disabled={!!!mobile}
+            onPress={handleToConfirmCode}
+          />
           <View marginT-10></View>
           <TouchableHighlight
             onPress={() => {
@@ -173,7 +174,11 @@ const Register = ({navigation}: any) => {
           ) : (
             <></>
           )}
-          <CustomButton label="はい" onPress={handleToConfirmCode} />
+          <CustomButton
+            label="はい"
+            disabled={!!!email}
+            onPress={handleToConfirmCode}
+          />
           <View marginT-10></View>
           <TouchableHighlight
             onPress={() => {
@@ -216,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   error: {
-    color: Colors.red1,
+    color: Colors.red10,
   },
 });
 

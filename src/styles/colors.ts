@@ -9,6 +9,7 @@ const darkMode = {
   dislike: '#20a39e',
   like: '#fe3c72',
   favorite: '#ffba49',
+  placeholder: '#ffffff99',
 };
 
 export default darkMode;

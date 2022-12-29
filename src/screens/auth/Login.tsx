@@ -32,14 +32,14 @@ const Login = ({navigation}: any) => {
 
   const handleLogin = () => {
     const operator = loginMethod === 'email' ? email : mobile;
-    if (operator === '') {
-      return setError(
-        loginMethod === 'email'
-          ? 'メールアドレスが入力されていません。'
-          : '電話番号を入力されていませんに変更してください。',
-      );
-    } else {
-      setError('');
+
+    if (loginMethod === 'email') {
+      let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+      if (reg.test(operator) === false) {
+        return setError('入力内容が正しくないのでご確認ください。');
+      } else {
+        setError('');
+      }
     }
     firestore()
       .collection('Users')
@@ -106,13 +106,15 @@ const Login = ({navigation}: any) => {
       />
       {loginMethod === 'email' ? (
         <>
-          <CustomText marginB-30>メールアドレスを入力してください</CustomText>
+          {/* <CustomText marginB-30>メールアドレスを入力してください</CustomText> */}
           <TextInput
             underlineColor={Colors.white}
             activeUnderlineColor={Colors.white}
             style={{...styles.emailInput}}
-            theme={{colors: {text: Colors.white}}}
+            theme={{colors: {text: !!error ? Colors.red10 : Colors.white}}}
             value={email}
+            placeholder="メールアドレスを入力してください。"
+            placeholderTextColor={Colors.placeholder}
             onChangeText={text => setEmail(text)}
           />
           {error ? (
@@ -122,7 +124,11 @@ const Login = ({navigation}: any) => {
           ) : (
             <></>
           )}
-          <CustomButton label="次へ" onPress={handleLogin} />
+          <CustomButton
+            label="次へ"
+            disabled={!!!email}
+            onPress={handleLogin}
+          />
           <View marginT-10></View>
           {/* <TouchableHighlight
             onPress={() => {
@@ -156,7 +162,7 @@ const Login = ({navigation}: any) => {
         </>
       ) : (
         <>
-          <CustomText marginB-30>電話番号を入力してください</CustomText>
+          {/* <CustomText marginB-30>電話番号を入力してください</CustomText> */}
           <View row>
             <TextInput
               underlineColor={Colors.white}
@@ -169,8 +175,10 @@ const Login = ({navigation}: any) => {
               underlineColor={Colors.white}
               activeUnderlineColor={Colors.white}
               style={{...styles.phoneNumberInput}}
-              theme={{colors: {text: Colors.white}}}
+              theme={{colors: {text: !!error ? Colors.red10 : Colors.white}}}
               value={mobile}
+              placeholder="電話番号を入力してください。"
+              placeholderTextColor={Colors.placeholder}
               onChangeText={text => setMobile(text.replace(/[^0-9]/g, ''))}
             />
           </View>
@@ -181,7 +189,11 @@ const Login = ({navigation}: any) => {
           ) : (
             <></>
           )}
-          <CustomButton label="次へ" onPress={handleLogin} />
+          <CustomButton
+            label="次へ"
+            disabled={!!!mobile}
+            onPress={handleLogin}
+          />
           <View marginT-10></View>
           {/* <TouchableHighlight
             onPress={() => {
@@ -244,7 +256,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   error: {
-    color: Colors.red1,
+    color: Colors.red10,
   },
 });
 
