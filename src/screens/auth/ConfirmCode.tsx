@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text} from 'react-native-ui-lib';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, TouchableHighlight} from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
 import {
   CodeField,
@@ -9,18 +9,30 @@ import {
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 import auth from '@react-native-firebase/auth';
+import axios from 'axios';
 
+import {setLoading} from '../../redux/features/globalSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
 const CELL_COUNT = 6;
 
+var emailConfirmCodeBaseURL =
+  'https://us-central1-okyuin-akiba.cloudfunctions.net/sendMail';
+
 const ConfirmCode = ({navigation, route}: any) => {
-  const {code, confirmation} = route.params;
+  let {code, confirmation, email, mobile} = route.params;
+  const dispatch = useAppDispatch();
   const loginMethod = useAppSelector((state: any) => state.global.loginMethod);
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
+  const [params, setParams] = useState({
+    code,
+    confirmation,
+    email,
+    mobile,
+  });
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
@@ -29,16 +41,17 @@ const ConfirmCode = ({navigation, route}: any) => {
 
   const handleConfirm = async () => {
     if (loginMethod === 'email') {
-      if (code === value) {
+      console.log(params.code, value);
+      if (params.code === value) {
         setError('');
         navigation.navigate('NameInput');
       } else {
-        setError('確認コードが正しくありません');
+        setError('※コードが正しくないのでご確認ください');
       }
     } else if (loginMethod === 'mobile') {
       try {
         const credential = auth.PhoneAuthProvider.credential(
-          confirmation.verificationId,
+          params.confirmation.verificationId,
           value,
         );
         setError('');
@@ -47,11 +60,60 @@ const ConfirmCode = ({navigation, route}: any) => {
         let error: any = err;
         if (error.code == 'auth/invalid-verification-code') {
           console.log('Invalid code.');
-          setError('確認コードが正しくありません');
+          setError('※コードが正しくないのでご確認ください');
         }
       }
     }
   };
+
+  const resendCode = async () => {
+    let resentCode = '',
+      resentConfirmation = null;
+    if (loginMethod === 'email') {
+      try {
+        dispatch(setLoading(true));
+        for (let i = 0; i < 6; i++) {
+          let each = Math.floor(Math.random() * 10) % 10;
+          resentCode += `${each}`;
+        }
+        const res = await axios.get(
+          emailConfirmCodeBaseURL + `?dest=${email}&code=${resentCode}`,
+        );
+        console.log(res.data);
+        if (res.data === 'Sended') {
+          dispatch(setLoading(false));
+          setParams({
+            ...params,
+            code: resentCode,
+          });
+          console.log('resentcode', code, resentCode);
+        }
+      } catch (err) {
+        console.log(err);
+        setError('何かがうまくいかなかった');
+      }
+    } else if (loginMethod === 'mobile') {
+      try {
+        setError('');
+        dispatch(setLoading(true));
+        resentConfirmation = await auth().verifyPhoneNumber(`+${mobile}`);
+        console.log('confirm finished');
+        if (resentConfirmation) {
+          console.log(resentConfirmation);
+          dispatch(setLoading(false));
+          setParams({
+            ...params,
+            code: resentCode,
+            confirmation: resentConfirmation,
+          });
+        }
+      } catch (err) {
+        console.log(err);
+        setError('何かがうまくいかなかった');
+      }
+    }
+  };
+
   return (
     <Container bottom centerH>
       <IconButton
@@ -61,47 +123,35 @@ const ConfirmCode = ({navigation, route}: any) => {
         size={30}
         onPress={() => navigation.goBack()}
       />
-      <CustomText marginB-30 style={styles.confirmLabel}>
-        認証コード
+
+      <CustomText marginB-10>
+        {loginMethod === 'email'
+          ? '確認のために以下のメールアドレスにメールをお送りいたしました。'
+          : '確認のために以下の電話番号に認証コードをお送りいたしました。'}
       </CustomText>
-      {/* <View row>
-        <TextInput
-          underlineColor={Colors.white}
-          activeUnderlineColor={Colors.white}
-          style={{...styles.letter}}
-          theme={{colors: {text: Colors.white}}}
-        />
-        <TextInput
-          underlineColor={Colors.white}
-          activeUnderlineColor={Colors.white}
-          style={{...styles.letter}}
-          theme={{colors: {text: Colors.white}}}
-        />
-        <TextInput
-          underlineColor={Colors.white}
-          activeUnderlineColor={Colors.white}
-          style={{...styles.letter}}
-          theme={{colors: {text: Colors.white}}}
-        />
-        <TextInput
-          underlineColor={Colors.white}
-          activeUnderlineColor={Colors.white}
-          style={{...styles.letter}}
-          theme={{colors: {text: Colors.white}}}
-        />
-        <TextInput
-          underlineColor={Colors.white}
-          activeUnderlineColor={Colors.white}
-          style={{...styles.letter}}
-          theme={{colors: {text: Colors.white}}}
-        />
-        <TextInput
-          underlineColor={Colors.white}
-          activeUnderlineColor={Colors.white}
-          style={{...styles.letter}}
-          theme={{colors: {text: Colors.white}}}
-        />
-      </View> */}
+      <CustomText marginB-10>
+        {loginMethod === 'email' ? email : mobile}
+      </CustomText>
+
+      {loginMethod === 'email' ? (
+        <CustomText marginB-30>
+          メールをご確認して認証コードを入力してください。
+        </CustomText>
+      ) : (
+        <View marginB-30></View>
+      )}
+
+      <CustomText marginB-10={!!!error} style={styles.confirmLabel}>
+        認証コードを入力してください
+      </CustomText>
+      {error ? (
+        <CustomText marginB-10 style={styles.error}>
+          {error}
+        </CustomText>
+      ) : (
+        <></>
+      )}
+
       <View>
         <CodeField
           ref={ref}
@@ -124,18 +174,13 @@ const ConfirmCode = ({navigation, route}: any) => {
           )}
         />
       </View>
-      {error ? (
-        <View>
-          <Text style={styles.error}>{error}</Text>
-        </View>
-      ) : (
-        <></>
-      )}
 
-      <CustomButton label="次へ" onPress={handleConfirm} />
-      <CustomText marginB-40 marginT-10>
-        認証コードの再送信をリクエストする
-      </CustomText>
+      <CustomButton label="次へ" disabled={!!!value} onPress={handleConfirm} />
+      <TouchableHighlight onPress={resendCode}>
+        <CustomText marginB-40 marginT-10>
+          認証コードの再送信をリクエストする
+        </CustomText>
+      </TouchableHighlight>
     </Container>
   );
 };
@@ -180,7 +225,8 @@ const styles = StyleSheet.create({
     borderColor: '#ffffff',
   },
   error: {
-    color: Colors.red1,
+    color: Colors.red10,
+    width: '80%',
   },
 });
 

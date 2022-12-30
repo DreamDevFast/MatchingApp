@@ -164,13 +164,13 @@ const Login = ({navigation}: any) => {
         <>
           {/* <CustomText marginB-30>電話番号を入力してください</CustomText> */}
           <View row>
-            <TextInput
+            {/* <TextInput
               underlineColor={Colors.white}
               activeUnderlineColor={Colors.white}
               style={{...styles.phonePrefixInput}}
               theme={{colors: {text: Colors.white}}}
               value={'+81'}
-            />
+            /> */}
             <TextInput
               underlineColor={Colors.white}
               activeUnderlineColor={Colors.white}
@@ -250,8 +250,8 @@ const styles = StyleSheet.create({
   },
   phoneNumberInput: {
     height: 30,
-    width: '64%',
-    marginLeft: '3%',
+    width: '80%',
+    // marginLeft: '3%',
     marginBottom: 50,
     backgroundColor: 'transparent',
   },

@@ -67,7 +67,11 @@ const Register = ({navigation}: any) => {
         console.log(res.data);
         if (res.data === 'Sended') {
           dispatch(setLoading(false));
-          return navigation.navigate('ConfirmCode', {code, confirmation});
+          return navigation.navigate('ConfirmCode', {
+            code,
+            confirmation,
+            email,
+          });
         }
       } catch (err) {
         console.log(err);
@@ -77,12 +81,16 @@ const Register = ({navigation}: any) => {
       try {
         setError('');
         dispatch(setLoading(true));
-        confirmation = await auth().verifyPhoneNumber(`+81${mobile}`);
+        confirmation = await auth().verifyPhoneNumber(`+${mobile}`);
         console.log('confirm finished');
         if (confirmation) {
           console.log(confirmation);
           dispatch(setLoading(false));
-          return navigation.navigate('ConfirmCode', {confirmation, code});
+          return navigation.navigate('ConfirmCode', {
+            confirmation,
+            code,
+            mobile,
+          });
         }
       } catch (err) {
         console.log(err);
@@ -111,13 +119,13 @@ const Register = ({navigation}: any) => {
             <CustomText marginB-30>電話番号を入力してください</CustomText>
           )}
           <View row>
-            <TextInput
+            {/* <TextInput
               underlineColor={Colors.white}
               activeUnderlineColor={Colors.white}
               style={{...styles.phonePrefixInput}}
               theme={{colors: {text: Colors.white}}}
               value={'+81'}
-            />
+            /> */}
             <TextInput
               underlineColor={Colors.white}
               activeUnderlineColor={Colors.white}
@@ -215,8 +223,8 @@ const styles = StyleSheet.create({
   },
   phoneNumberInput: {
     height: 30,
-    width: '64%',
-    marginLeft: '3%',
+    width: '80%',
+    // marginLeft: '3%',
     marginBottom: 50,
     backgroundColor: 'transparent',
   },
