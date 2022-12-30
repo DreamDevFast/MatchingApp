@@ -3,6 +3,8 @@ import {View} from 'react-native-ui-lib';
 import {TextInput, IconButton} from 'react-native-paper';
 import {StyleSheet} from 'react-native';
 
+import firestore from '@react-native-firebase/firestore';
+
 import {Colors} from '../../styles';
 import {Container, CustomButton, CustomText} from '../../components';
 
@@ -11,7 +13,11 @@ import {setTempUser} from '../../redux/features/globalSlice';
 
 const NameInput = ({navigation}: any) => {
   const tempUser = useAppSelector((state: any) => state.global.tempUser);
+  const [error, setError] = useState<string>('');
+
   const dispatch = useAppDispatch();
+
+  const users = firestore().collection('Users');
 
   const handleNameInput = (name: string) => {
     dispatch(
@@ -20,6 +26,26 @@ const NameInput = ({navigation}: any) => {
         name,
       }),
     );
+  };
+
+  const goToBirthdayInput = () => {
+    console.log(tempUser.name);
+    users
+      .where('name', '==', tempUser.name)
+      .get()
+      .then(querySnapshot => {
+        console.log(querySnapshot.docs.length);
+        if (querySnapshot.size) {
+          setError('すでに使われています。別の名前にしてください。');
+        } else {
+          setError('');
+          navigation.navigate('BirthdayInput');
+        }
+      })
+      .catch(err => {
+        setError(err);
+        console.log(err);
+      });
   };
   return (
     <Container bottom centerH>
@@ -31,19 +57,29 @@ const NameInput = ({navigation}: any) => {
         onPress={() => navigation.goBack()}
       />
       <CustomText marginB-50>
-        お名前かニックネームを 入力してください{tempUser.email}
+        アプリで表示されるニックネームを入力してください。
       </CustomText>
+      {error ? (
+        <CustomText marginB-10 style={styles.error}>
+          {error}
+        </CustomText>
+      ) : (
+        <></>
+      )}
       <TextInput
         underlineColor={Colors.white}
         activeUnderlineColor={Colors.white}
         style={{...styles.nameInput}}
         theme={{colors: {text: Colors.white}}}
+        placeholder="ニックネームを入力してください"
+        placeholderTextColor={Colors.placeholder}
         value={tempUser.name}
         onChangeText={handleNameInput}
       />
       <CustomButton
         label="次へ"
-        onPress={() => navigation.navigate('BirthdayInput')}
+        disabled={!!!tempUser.name}
+        onPress={goToBirthdayInput}
       />
       <View marginB-100></View>
     </Container>
@@ -58,9 +94,12 @@ const styles = StyleSheet.create({
   },
   nameInput: {
     height: 30,
-    width: '70%',
+    width: '80%',
     marginBottom: 50,
     backgroundColor: 'transparent',
+  },
+  error: {
+    color: Colors.red10,
   },
 });
 
