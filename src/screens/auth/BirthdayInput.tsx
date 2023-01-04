@@ -32,7 +32,7 @@ const BirthdayInput = ({navigation}: any) => {
         size={30}
         onPress={() => navigation.goBack()}
       />
-      <CustomText marginB-30>誕生日を入力してください</CustomText>
+      <CustomText marginB-30>誕生日を選択してください。</CustomText>
       <DatePicker
         title={'birthday'}
         date={new Date(tempUser.birthday)}
