@@ -4,6 +4,8 @@ import {StyleSheet, TouchableHighlight} from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
 import {View, Text} from 'react-native-ui-lib';
 
+import syncStorage from 'sync-storage';
+
 import firestore from '@react-native-firebase/firestore';
 
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
@@ -74,6 +76,9 @@ const Login = ({navigation}: any) => {
             }),
           );
           dispatch(setAuthenticated(true));
+
+          syncStorage.set('token', operator);
+          console.log('storage token after login', syncStorage.get('token'));
           navigation.navigate('UserDashBoard');
         } else {
           dispatch(

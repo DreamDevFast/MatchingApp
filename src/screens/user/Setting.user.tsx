@@ -10,8 +10,14 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {TextInput, Switch, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 
+import syncStorage from 'sync-storage';
+
 import {useAppDispatch, useAppSelector} from '../../redux/reduxHooks';
-import {setTempUser, setLoading} from '../../redux/features/globalSlice';
+import {
+  setTempUser,
+  setLoading,
+  setAuthenticated,
+} from '../../redux/features/globalSlice';
 import {
   setSetting,
   Range,
@@ -220,6 +226,10 @@ const UserSetting = ({navigation}: any) => {
     [],
   );
 
+  const logout = async () => {
+    await syncStorage.remove('token');
+    dispatch(setAuthenticated(false));
+  };
   return (
     <Container centerH>
       <Loader isLoading={isLoading} />
@@ -405,7 +415,7 @@ const UserSetting = ({navigation}: any) => {
               color={Colors.redBtn}
               labelStyle={styles.logoutLabel}
               style={styles.logout}
-              onPress={saveAndReturn}
+              onPress={logout}
             />
           </View>
         </View>

@@ -24,7 +24,7 @@ export interface GlobalState {
 }
 
 const initialState: GlobalState = {
-  isLoading: false,
+  isLoading: true,
   isAuthenticated: false,
   tempUser: {
     id: '',
