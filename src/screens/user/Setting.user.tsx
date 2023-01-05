@@ -57,6 +57,7 @@ const UserSetting = ({navigation}: any) => {
   });
 
   const settings = firestore().collection('Settings');
+  const users = firestore().collection('Users');
 
   const dispatch = useAppDispatch();
 
@@ -108,8 +109,96 @@ const UserSetting = ({navigation}: any) => {
     }, []),
   );
 
-  const onToggleSwitch = () => {
+  const save = async (key: string, value: any) => {
+    try {
+      dispatch(setLoading(true));
+      if (key === 'email' || key === 'mobile') {
+        try {
+          await firestore()
+            .collection('Users')
+            .doc(tempUser.id)
+            .update({
+              [key]: value,
+            });
+          console.log('update user info succeeded!');
+          dispatch(setTempUser({...tempUser, [key]: value}));
+          dispatch(setLoading(false));
+        } catch (err) {
+          console.log('Update "Users" collection error: ', err);
+        }
+      } else if (setting.id === '') {
+        await firestore()
+          .collection('Settings')
+          .doc(tempUser.id)
+          .set({
+            ...{
+              isNotifying,
+              keyword,
+              searchLocation,
+              priceRange,
+              unlimitedLikesAndChat,
+              ageRange,
+            },
+            [key]: value,
+          });
+        console.log('save setting info succeeded!');
+        dispatch(
+          setSetting({
+            ...{
+              id: tempUser.id,
+              isNotifying,
+              searchLocation,
+              keyword,
+              priceRange,
+              unlimitedLikesAndChat,
+              ageRange,
+            },
+            [key]: value,
+          }),
+        );
+        dispatch(setLoading(false));
+      } else if (setting.id === tempUser.id) {
+        await firestore()
+          .collection('Settings')
+          .doc(setting.id)
+          .update({
+            ...{
+              isNotifying,
+              keyword,
+              searchLocation,
+              priceRange,
+              unlimitedLikesAndChat,
+              ageRange,
+            },
+            [key]: value,
+          });
+        console.log('update setting info succeeded!', ageRange);
+        dispatch(
+          setSetting({
+            ...{
+              id: tempUser.id,
+              isNotifying,
+              searchLocation,
+              keyword,
+              priceRange,
+              unlimitedLikesAndChat,
+              ageRange,
+            },
+            [key]: value,
+          }),
+        );
+        dispatch(setLoading(false));
+      } else {
+        console.log('setting id is NOT equal to tempUser id');
+      }
+    } catch (err) {
+      console.log('Create or Update "Settings" collection error: ', err);
+    }
+  };
+
+  const onToggleSwitch = async () => {
     SetNotifying(!isNotifying);
+    await save('isNotifying', !isNotifying);
   };
 
   const renderThumb = useCallback(() => <Thumb />, []);
@@ -120,14 +209,22 @@ const UserSetting = ({navigation}: any) => {
     [],
   );
   const renderNotch = useCallback(() => <Notch />, []);
-  const handlePriceValueChange = useCallback((low: number, high: number) => {
-    SetPriceRange({low, high});
-  }, []);
+  const handlePriceValueChange = useCallback(
+    async (low: number, high: number) => {
+      SetPriceRange({low, high});
+      await save('priceRange', {low, high});
+    },
+    [],
+  );
 
-  const handleAgeValueChange = useCallback((low: number, high: number) => {
-    console.log(low, high);
-    SetAgeRange({low, high});
-  }, []);
+  const handleAgeValueChange = useCallback(
+    async (low: number, high: number) => {
+      console.log(low, high);
+      SetAgeRange({low, high});
+      await save('ageRange', {low, high});
+    },
+    [],
+  );
 
   const saveAndReturn = async () => {
     dispatch(setLoading(true));
@@ -212,7 +309,7 @@ const UserSetting = ({navigation}: any) => {
   );
 
   const handleSettingValue = useCallback(
-    (key: 'searchLocation' | 'keyword' | 'unlimitedLikesAndChat') => (
+    (key: 'searchLocation' | 'keyword' | 'unlimitedLikesAndChat') => async (
       value: string,
     ) => {
       if (key === 'searchLocation') {
@@ -222,6 +319,7 @@ const UserSetting = ({navigation}: any) => {
       } else if (key === 'unlimitedLikesAndChat') {
         SetUnlimited(value);
       }
+      await save(key, value);
     },
     [],
   );
@@ -230,6 +328,7 @@ const UserSetting = ({navigation}: any) => {
     await syncStorage.remove('token');
     dispatch(setAuthenticated(false));
   };
+
   return (
     <Container centerH>
       <Loader isLoading={isLoading} />
